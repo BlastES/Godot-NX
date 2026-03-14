@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  syslog_logger.cpp                                                     */
+/*  joypad_switch.h                                                       */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,57 +28,48 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#if defined(UNIX_ENABLED) && !defined(SWITCH_ENABLED)
+#ifndef JOYPAD_SWITCH_H
+#define JOYPAD_SWITCH_H
 
-#include "syslog_logger.h"
+#include "switch_wrapper.h"
 
-#include "core/string/print_string.h"
+#include <core/input/input.h>
+#include <core/input/input_enums.h>
 
-#include <syslog.h>
+#include <array>
+#include <vector>
 
-void SyslogLogger::logv(const char *p_format, va_list p_list, bool p_err) {
-	if (!should_log(p_err)) {
-		return;
-	}
+typedef std::vector<std::pair<uint, JoyButton>> PadMappingSwitch;
 
-	vsyslog(p_err ? LOG_ERR : LOG_INFO, p_format, p_list);
-}
+struct PadStateSwitch : public PadState {
+	bool initialized = false;
+	int id = 0;
+	PadMappingSwitch mapping = {};
+};
 
-void SyslogLogger::print_error(const char *p_function, const char *p_file, int p_line, const char *p_code, const char *p_rationale, ErrorType p_type) {
-	if (!should_log(true)) {
-		return;
-	}
+class JoypadSwitch {
+private:
+	std::array<PadStateSwitch, 8> _pads; //switch support up to 8 controllers
 
-	const char *err_type = "**ERROR**";
-	switch (p_type) {
-		case ERR_ERROR:
-			err_type = "**ERROR**";
-			break;
-		case ERR_WARNING:
-			err_type = "**WARNING**";
-			break;
-		case ERR_SCRIPT:
-			err_type = "**SCRIPT ERROR**";
-			break;
-		case ERR_SHADER:
-			err_type = "**SHADER ERROR**";
-			break;
-		default:
-			ERR_PRINT("Unknown error type");
-			break;
-	}
+protected:
+public:
+	PadStateSwitch &get_pad(int i = 0) { return _pads[i]; }
 
-	const char *err_details;
-	if (p_rationale && *p_rationale) {
-		err_details = p_rationale;
-	} else {
-		err_details = p_code;
-	}
+	//when only both joy-con are use as a single controller (general case)
+	static const PadMappingSwitch switch_joy_dual_button_map;
+	//when only right joy-con is use as a controller horizontally
+	static const PadMappingSwitch switch_joy_right_button_map;
+	//when only left joy-con is use as a controller horizontally
+	static const PadMappingSwitch switch_joy_left_button_map;
 
-	syslog(p_type == ERR_WARNING ? LOG_WARNING : LOG_ERR, "%s: %s\n   At: %s:%i:%s() - %s", err_type, err_details, p_file, p_line, p_function, p_code);
-}
+	void initialize();
+	void discover_pad(PadStateSwitch &pad);
+	void dispatch(PadStateSwitch &pad);
 
-SyslogLogger::~SyslogLogger() {
-}
+	void process();
 
-#endif
+	JoypadSwitch();
+	virtual ~JoypadSwitch() = default;
+};
+
+#endif // JOYPAD_SWITCH_H

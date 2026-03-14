@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  syslog_logger.cpp                                                     */
+/*  godot_switch.cpp                                                      */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,57 +28,42 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#if defined(UNIX_ENABLED) && !defined(SWITCH_ENABLED)
+#include <limits.h>
+#include <locale.h>
+#include <png.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <zlib.h>
 
-#include "syslog_logger.h"
+#include "main/main.h"
 
-#include "core/string/print_string.h"
+#include "os_switch.h"
 
-#include <syslog.h>
+// just to keep the main clean
+#include <applet_splash.hpp>
 
-void SyslogLogger::logv(const char *p_format, va_list p_list, bool p_err) {
-	if (!should_log(p_err)) {
-		return;
-	}
+int main(int argc, char *argv[]) {
+	std::vector<std::string> args(argv, argv + argc);
 
-	vsyslog(p_err ? LOG_ERR : LOG_INFO, p_format, p_list);
-}
+	OS_Switch os(args);
 
-void SyslogLogger::print_error(const char *p_function, const char *p_file, int p_line, const char *p_code, const char *p_rationale, ErrorType p_type) {
-	if (!should_log(true)) {
-		return;
-	}
-
-	const char *err_type = "**ERROR**";
-	switch (p_type) {
-		case ERR_ERROR:
-			err_type = "**ERROR**";
-			break;
-		case ERR_WARNING:
-			err_type = "**WARNING**";
-			break;
-		case ERR_SCRIPT:
-			err_type = "**SCRIPT ERROR**";
-			break;
-		case ERR_SHADER:
-			err_type = "**SHADER ERROR**";
-			break;
-		default:
-			ERR_PRINT("Unknown error type");
-			break;
-	}
-
-	const char *err_details;
-	if (p_rationale && *p_rationale) {
-		err_details = p_rationale;
+	int apptype = appletGetAppletType();
+	if (apptype != AppletType_Application && apptype != AppletType_SystemApplication) {
+		// godot is not involved here we jsut display error message
+		ERR_PRINT("application in applet mode!");
+		display_applet_splash();
 	} else {
-		err_details = p_code;
+		os.print("Main::setup\n");
+		Error err = Main::setup(argv[0], argc - 1, &argv[1]);
+		if (err != OK) {
+			return 255;
+		}
+		os.print("Main::start\n");
+		if (Main::start()) {
+			os.run();
+		}
+		Main::cleanup();
 	}
-
-	syslog(p_type == ERR_WARNING ? LOG_WARNING : LOG_ERR, "%s: %s\n   At: %s:%i:%s() - %s", err_type, err_details, p_file, p_line, p_function, p_code);
+	os.print("godot switch exit\n");
+	return 0;
 }
-
-SyslogLogger::~SyslogLogger() {
-}
-
-#endif

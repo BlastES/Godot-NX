@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  syslog_logger.cpp                                                     */
+/*  applet_splash.hpp                                                     */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,57 +28,68 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#if defined(UNIX_ENABLED) && !defined(SWITCH_ENABLED)
+#include <switch_wrapper.h>
 
-#include "syslog_logger.h"
+#define WIDTH 1280
+#define HEIGHT 720
 
-#include "core/string/print_string.h"
+// applet_splash.rgba.gz (available in romfs)
+// will be display instead of the actual godot app if the app is not
+// started properly from the switch
+// see ref ()
+int display_applet_splash() {
+	romfsInit();
 
-#include <syslog.h>
+	NWindow *win = nwindowGetDefault();
+	Framebuffer fb;
+	framebufferCreate(&fb, win, WIDTH, HEIGHT, PIXEL_FORMAT_RGBA_8888, 1);
+	framebufferMakeLinear(&fb);
 
-void SyslogLogger::logv(const char *p_format, va_list p_list, bool p_err) {
-	if (!should_log(p_err)) {
-		return;
+	u32 stride;
+	u32 *framebuf = (u32 *)framebufferBegin(&fb, &stride);
+
+	FILE *splash = fopen("romfs:/applet_splash.rgba.gz", "rb");
+
+	fseek(splash, 0, SEEK_END);
+	size_t splash_size = ftell(splash);
+
+	u8 *compressed_splash = (u8 *)malloc(splash_size);
+	memset(compressed_splash, 0, splash_size);
+	fseek(splash, 0, SEEK_SET);
+
+	fread(compressed_splash, 1, splash_size, splash);
+	fclose(splash);
+
+	memset(framebuf, 0, stride * HEIGHT);
+
+	struct z_stream_s stream;
+	memset(&stream, 0, sizeof(stream));
+	stream.zalloc = NULL;
+
+	stream.zfree = NULL;
+	stream.next_in = compressed_splash;
+	stream.avail_in = splash_size;
+	stream.next_out = (u8 *)framebuf;
+	stream.avail_out = stride * HEIGHT;
+
+	inflateInit2(&stream, 16 + MAX_WBITS);
+	inflate(&stream, 0);
+	inflateEnd(&stream);
+
+	framebufferEnd(&fb);
+
+	// set up input
+	PadState pad;
+	padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+	padInitializeDefault(&pad);
+	while (appletMainLoop()) {
+		padUpdate(&pad);
+		if (padGetButtonsDown(&pad) != 0) {
+			break;
+		}
 	}
 
-	vsyslog(p_err ? LOG_ERR : LOG_INFO, p_format, p_list);
+	framebufferClose(&fb);
+	romfsExit();
+	return 0;
 }
-
-void SyslogLogger::print_error(const char *p_function, const char *p_file, int p_line, const char *p_code, const char *p_rationale, ErrorType p_type) {
-	if (!should_log(true)) {
-		return;
-	}
-
-	const char *err_type = "**ERROR**";
-	switch (p_type) {
-		case ERR_ERROR:
-			err_type = "**ERROR**";
-			break;
-		case ERR_WARNING:
-			err_type = "**WARNING**";
-			break;
-		case ERR_SCRIPT:
-			err_type = "**SCRIPT ERROR**";
-			break;
-		case ERR_SHADER:
-			err_type = "**SHADER ERROR**";
-			break;
-		default:
-			ERR_PRINT("Unknown error type");
-			break;
-	}
-
-	const char *err_details;
-	if (p_rationale && *p_rationale) {
-		err_details = p_rationale;
-	} else {
-		err_details = p_code;
-	}
-
-	syslog(p_type == ERR_WARNING ? LOG_WARNING : LOG_ERR, "%s: %s\n   At: %s:%i:%s() - %s", err_type, err_details, p_file, p_line, p_function, p_code);
-}
-
-SyslogLogger::~SyslogLogger() {
-}
-
-#endif

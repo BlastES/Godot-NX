@@ -30,7 +30,7 @@
 
 #include "ip_unix.h"
 
-#if defined(UNIX_ENABLED) || defined(WINDOWS_ENABLED)
+#if (defined(UNIX_ENABLED) || defined(WINDOWS_ENABLED)) && !defined(SWITCH_ENABLED)
 
 #include <string.h>
 

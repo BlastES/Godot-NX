@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  syslog_logger.cpp                                                     */
+/*  touch_screen_switch.cpp                                               */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,57 +28,62 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#if defined(UNIX_ENABLED) && !defined(SWITCH_ENABLED)
+#include "touch_screen_switch.h"
 
-#include "syslog_logger.h"
+#include <iostream>
 
-#include "core/string/print_string.h"
-
-#include <syslog.h>
-
-void SyslogLogger::logv(const char *p_format, va_list p_list, bool p_err) {
-	if (!should_log(p_err)) {
-		return;
-	}
-
-	vsyslog(p_err ? LOG_ERR : LOG_INFO, p_format, p_list);
+TouchScreenSwitch::TouchScreenSwitch() {
 }
 
-void SyslogLogger::print_error(const char *p_function, const char *p_file, int p_line, const char *p_code, const char *p_rationale, ErrorType p_type) {
-	if (!should_log(true)) {
-		return;
-	}
-
-	const char *err_type = "**ERROR**";
-	switch (p_type) {
-		case ERR_ERROR:
-			err_type = "**ERROR**";
-			break;
-		case ERR_WARNING:
-			err_type = "**WARNING**";
-			break;
-		case ERR_SCRIPT:
-			err_type = "**SCRIPT ERROR**";
-			break;
-		case ERR_SHADER:
-			err_type = "**SHADER ERROR**";
-			break;
-		default:
-			ERR_PRINT("Unknown error type");
-			break;
-	}
-
-	const char *err_details;
-	if (p_rationale && *p_rationale) {
-		err_details = p_rationale;
-	} else {
-		err_details = p_code;
-	}
-
-	syslog(p_type == ERR_WARNING ? LOG_WARNING : LOG_ERR, "%s: %s\n   At: %s:%i:%s() - %s", err_type, err_details, p_file, p_line, p_function, p_code);
+TouchScreenSwitch::~TouchScreenSwitch() {
 }
 
-SyslogLogger::~SyslogLogger() {
+void TouchScreenSwitch::initialize() {
+	hidInitializeTouchScreen();
 }
 
-#endif
+void TouchScreenSwitch::process() {
+	auto drop_touches = _touches;
+
+	HidTouchScreenState state;
+	if (hidGetTouchScreenStates(&state, 1)) {
+
+		//for (int i = 0; i < state.count; i++) {
+		//	std::cout << i << " [" << state.touches[i].finger_id << "] " << state.touches[i].attributes << " ("
+		//			  << state.touches[i].x << "," << state.touches[i].y << ")" << std::endl;
+		//}
+
+		for (int i = 0; i < state.count; i++) {
+			const int id = state.touches[i].finger_id;
+
+			drop_touches.erase(id);
+			auto it = _touches.find(id);
+
+			if (it == _touches.end()) { //new touch
+				_touches[id] = state.touches[i];
+			}
+
+			Vector2 pos(_touches[id].x, _touches[id].y);
+			Ref<InputEventScreenTouch> ev;
+			ev.instantiate();
+			ev->set_index(id);
+			ev->set_position(pos);
+			ev->set_pressed(true);
+			Input::get_singleton()->parse_input_event(ev);
+		}
+	}
+
+	for (auto &it : drop_touches) {
+		const int id = it.first;
+        Vector2 pos(_touches[id].x, _touches[id].y);
+
+		_touches.erase(id);
+
+        Ref<InputEventScreenTouch> ev;
+		ev.instantiate();
+		ev->set_index(id);
+        ev->set_position(pos);
+		ev->set_pressed(false);
+		Input::get_singleton()->parse_input_event(ev);
+	}
+}

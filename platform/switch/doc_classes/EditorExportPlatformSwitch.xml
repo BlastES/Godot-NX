@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="EditorExportPlatformSwitch" inherits="EditorExportPlatformPC" version="4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../class.xsd">
+	<brief_description>
+		Exporter for Nintendo Switch (switchbrew).
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+		<link title="Exporting for Nintendo Switch">$DOCS_URL/tutorials/export/exporting_for_switch.html</link>
+	</tutorials>
+	<members>
+		<member name="texture_format/bptc" type="bool" setter="" getter="">
+			If [code]true[/code], project textures are exported in the BPTC format.
+		</member>
+		<member name="texture_format/etc" type="bool" setter="" getter="">
+			If [code]true[/code], project textures are exported in the ETC format.
+		</member>
+		<member name="texture_format/etc2" type="bool" setter="" getter="">
+			If [code]true[/code], project textures are exported in the ETC2 format.
+		</member>
+		<member name="texture_format/s3tc" type="bool" setter="" getter="">
+			If [code]true[/code], project textures are exported in the S3TC format.
+		</member>
+	</members>
+</class>

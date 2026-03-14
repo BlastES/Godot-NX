@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  syslog_logger.cpp                                                     */
+/*  export_plugin.h                                                       */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,57 +28,41 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#if defined(UNIX_ENABLED) && !defined(SWITCH_ENABLED)
+#ifndef SWITCH_EXPORT_PLUGIN_H
+#define SWITCH_EXPORT_PLUGIN_H
 
-#include "syslog_logger.h"
+#include "core/io/file_access.h"
+#include "editor/editor_settings.h"
+#include "editor/export/editor_export_platform_pc.h"
+#include "scene/resources/texture.h"
 
-#include "core/string/print_string.h"
+class EditorExportPlatformSwitch : public EditorExportPlatformPC {
+	GDCLASS(EditorExportPlatformSwitch, EditorExportPlatformPC);
 
-#include <syslog.h>
+	Ref<ImageTexture> run_icon;
+	Ref<ImageTexture> stop_icon;
 
-void SyslogLogger::logv(const char *p_format, va_list p_list, bool p_err) {
-	if (!should_log(p_err)) {
-		return;
-	}
+	int menu_options = 0;
 
-	vsyslog(p_err ? LOG_ERR : LOG_INFO, p_format, p_list);
-}
+public:
+	virtual void get_export_options(List<ExportOption> *r_options) const override;
+	virtual List<String> get_binary_extensions(const Ref<EditorExportPreset> &p_preset) const override;
+	virtual bool get_export_option_visibility(const EditorExportPreset *p_preset, const String &p_option) const override;
+	virtual Error export_project(const Ref<EditorExportPreset> &p_preset, bool p_debug, const String &p_path, int p_flags = 0) override;
+	virtual String get_template_file_name(const String &p_target, const String &p_arch) const override;
+	String get_export_option_warning(const EditorExportPreset *p_preset, const StringName &p_name) const override;
+	virtual Error fixup_embedded_pck(const String &p_path, int64_t p_embedded_start, int64_t p_embedded_size) override;
 
-void SyslogLogger::print_error(const char *p_function, const char *p_file, int p_line, const char *p_code, const char *p_rationale, ErrorType p_type) {
-	if (!should_log(true)) {
-		return;
-	}
+	virtual Ref<Texture2D> get_run_icon() const override;
+	virtual bool poll_export() override;
+	virtual Ref<ImageTexture> get_option_icon(int p_index) const override;
+	virtual int get_options_count() const override;
+	virtual String get_option_label(int p_index) const override;
+	virtual String get_option_tooltip(int p_index) const override;
 
-	const char *err_type = "**ERROR**";
-	switch (p_type) {
-		case ERR_ERROR:
-			err_type = "**ERROR**";
-			break;
-		case ERR_WARNING:
-			err_type = "**WARNING**";
-			break;
-		case ERR_SCRIPT:
-			err_type = "**SCRIPT ERROR**";
-			break;
-		case ERR_SHADER:
-			err_type = "**SHADER ERROR**";
-			break;
-		default:
-			ERR_PRINT("Unknown error type");
-			break;
-	}
+	virtual Error run(const Ref<EditorExportPreset> &p_preset, int p_device, int p_debug_flags) override;
 
-	const char *err_details;
-	if (p_rationale && *p_rationale) {
-		err_details = p_rationale;
-	} else {
-		err_details = p_code;
-	}
+	EditorExportPlatformSwitch();
+};
 
-	syslog(p_type == ERR_WARNING ? LOG_WARNING : LOG_ERR, "%s: %s\n   At: %s:%i:%s() - %s", err_type, err_details, p_file, p_line, p_function, p_code);
-}
-
-SyslogLogger::~SyslogLogger() {
-}
-
-#endif
+#endif // SWITCH_EXPORT_PLUGIN_H

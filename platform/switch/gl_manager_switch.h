@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  syslog_logger.cpp                                                     */
+/*  gl_manager_switch.h                                                   */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,57 +28,41 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#if defined(UNIX_ENABLED) && !defined(SWITCH_ENABLED)
+#ifndef GL_MANAGER_SWITCH_H
+#define GL_MANAGER_SWITCH_H
 
-#include "syslog_logger.h"
+#include "core/os/os.h"
 
-#include "core/string/print_string.h"
+#include <EGL/egl.h> // EGL library
+#include <EGL/eglext.h> // EGL extensions
+#include <GL/gl.h>
+#include <GLES3/gl3.h>
 
-#include <syslog.h>
+#include "switch_wrapper.h"
 
-void SyslogLogger::logv(const char *p_format, va_list p_list, bool p_err) {
-	if (!should_log(p_err)) {
-		return;
-	}
+class GLManagerSwitch {
+	bool _vsync = true;
+	EGLDisplay _display = nullptr;
+	EGLContext _context = nullptr;
+	EGLSurface _surface = nullptr;
 
-	vsyslog(p_err ? LOG_ERR : LOG_INFO, p_format, p_list);
-}
+	friend class DisplayServerSwitch;
 
-void SyslogLogger::print_error(const char *p_function, const char *p_file, int p_line, const char *p_code, const char *p_rationale, ErrorType p_type) {
-	if (!should_log(true)) {
-		return;
-	}
+public:
+	void release_current();
+	void make_current();
 
-	const char *err_type = "**ERROR**";
-	switch (p_type) {
-		case ERR_ERROR:
-			err_type = "**ERROR**";
-			break;
-		case ERR_WARNING:
-			err_type = "**WARNING**";
-			break;
-		case ERR_SCRIPT:
-			err_type = "**SCRIPT ERROR**";
-			break;
-		case ERR_SHADER:
-			err_type = "**SHADER ERROR**";
-			break;
-		default:
-			ERR_PRINT("Unknown error type");
-			break;
-	}
+	void swap_buffers();
 
-	const char *err_details;
-	if (p_rationale && *p_rationale) {
-		err_details = p_rationale;
-	} else {
-		err_details = p_code;
-	}
+	//TODO:vrince this is not doing anything
+	void set_use_vsync(bool use) { _vsync = use; }
+	bool is_using_vsync() const { return _vsync; }
 
-	syslog(p_type == ERR_WARNING ? LOG_WARNING : LOG_ERR, "%s: %s\n   At: %s:%i:%s() - %s", err_type, err_details, p_file, p_line, p_function, p_code);
-}
+	Error initialize(NWindow *window);
+	void cleanup();
 
-SyslogLogger::~SyslogLogger() {
-}
+	GLManagerSwitch();
+	virtual ~GLManagerSwitch();
+};
 
-#endif
+#endif // GL_MANAGER_SWITCH_H
