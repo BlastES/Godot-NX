@@ -150,12 +150,12 @@ Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &
 }
 
 String EditorExportPlatformSwitch::get_template_file_name(const String &p_target, const String &p_arch) const {
-	return "switch_" + p_target + ".arm64";
+	return "switch_" + p_target + ".nro";
 }
 
 List<String> EditorExportPlatformSwitch::get_binary_extensions(const Ref<EditorExportPreset> &p_preset) const {
 	List<String> list;
-	list.push_back("arm64");
+	list.push_back("nro");
 	return list;
 }
 

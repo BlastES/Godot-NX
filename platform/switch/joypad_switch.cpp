@@ -33,7 +33,7 @@
 #include <iostream>
 
 //when only both joy-con are use as a single controller (general case)
-const std::vector<std::pair<uint, JoyButton>> JoypadSwitch::switch_joy_dual_button_map = {
+const PadMappingSwitch JoypadSwitch::switch_joy_dual_button_map = {
 	{ HidNpadButton_A, JoyButton::A },
 	{ HidNpadButton_B, JoyButton::B },
 	{ HidNpadButton_X, JoyButton::X },
@@ -53,7 +53,7 @@ const std::vector<std::pair<uint, JoyButton>> JoypadSwitch::switch_joy_dual_butt
 };
 
 //when only right joy-con is use as a controller horizontally
-const std::vector<std::pair<uint, JoyButton>> JoypadSwitch::switch_joy_right_button_map = {
+const PadMappingSwitch JoypadSwitch::switch_joy_right_button_map = {
 	{ HidNpadButton_A, JoyButton::B },
 	{ HidNpadButton_B, JoyButton::Y },
 	{ HidNpadButton_X, JoyButton::A },
@@ -69,7 +69,7 @@ const std::vector<std::pair<uint, JoyButton>> JoypadSwitch::switch_joy_right_but
 };
 
 //when only left joy-con is use as a controller horizontally
-const std::vector<std::pair<uint, JoyButton>> JoypadSwitch::switch_joy_left_button_map = {
+const PadMappingSwitch JoypadSwitch::switch_joy_left_button_map = {
 	{ HidNpadButton_ZL, JoyButton::MISC1 }, //not sure twhat to do with this button
 	{ HidNpadButton_Minus, JoyButton::START },
 	{ HidNpadButton_Left, JoyButton::B },

@@ -113,11 +113,6 @@ void OS_Switch::run() {
 		_touch_screen->process();
 		_keyboard->process();
 
-		u32 kDown = padGetButtonsDown(&_joypads->get_pad());
-		if (kDown & HidNpadButton_Plus) {
-			break;
-		}
-
 		if (Main::iteration()) {
 			break;
 		}
