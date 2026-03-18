@@ -191,13 +191,13 @@ void JoypadSwitch::process() {
 				input->joy_button(pad.id, button.second, false);
 			}
 		}
-		
+
 		for (const auto &button : pad.mapping.second) {
 			if (kDown & button.first) {
-				input->joy_axis(pad.id, button.second, true);
+				input->joy_axis(pad.id, button.second, 1);
 			}
 			if (kUp & button.first) {
-				input->joy_axis(pad.id, button.second, false);
+				input->joy_axis(pad.id, button.second, 1);
 			}
 		}
 
@@ -206,8 +206,8 @@ void JoypadSwitch::process() {
 
 		if (pad.style_set & HidNpadStyleTag_NpadJoyLeft) {
 			// only left stick available and rotated 90 anti-clock wise
-			input->joy_axis(i, JoyAxis::LEFT_Y, (float)(leftStick.x) / float(JOYSTICK_MAX));
-			input->joy_axis(i, JoyAxis::LEFT_X, (float)(leftStick.y) / float(JOYSTICK_MAX));
+			input->joy_axis(i, JoyAxis::LEFT_Y, -(float)(leftStick.x) / float(JOYSTICK_MAX));
+			input->joy_axis(i, JoyAxis::LEFT_X, -(float)(leftStick.y) / float(JOYSTICK_MAX));
 		} else if (pad.style_set & HidNpadStyleTag_NpadJoyRight) {
 			// only left stick available and rotated 90 clock wise
 			input->joy_axis(i, JoyAxis::LEFT_Y, (float)(rightStick.x) / float(JOYSTICK_MAX));

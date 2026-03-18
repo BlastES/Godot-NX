@@ -98,7 +98,7 @@ Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &
 
 			err = OS::get_singleton()->execute(nacp_tool_path, args, &output, &exit_code, true);
 			ERR_FAIL_COND_V_MSG(exit_code != 0, err, output);
-			add_message(EXPORT_MESSAGE_INFO, TTR("Export"), TTR("nacp OK"));
+			add_message(EXPORT_MESSAGE_INFO, TTRC("Export"), TTRC("nacp OK"));
 		}
 
 		// make the romfs temp dir
@@ -120,6 +120,7 @@ Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &
 			String output;
 			String elf2nro_path = bin_path.path_join(String(p_preset->get("devkitpro/nro")));
 
+
 			args.push_back(p_path);
 			args.push_back(nro_path);
 			args.push_back("--icon=\"" + default_icon_path + "\"");
@@ -128,7 +129,7 @@ Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &
 
 			err = OS::get_singleton()->execute(elf2nro_path, args, &output, &exit_code, true);
 			ERR_FAIL_COND_V_MSG(exit_code != 0, err, output);
-			add_message(EXPORT_MESSAGE_INFO, TTR("Export"), TTR("elf2nro OK"));
+			add_message(EXPORT_MESSAGE_INFO, TTRC("Export"), TTRC("elf2nro OK"));
 		}
 
 		//if nxlink is enabled send it
@@ -142,7 +143,7 @@ Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &
 
 			err = OS::get_singleton()->execute(nxlink_path, args, &output, &exit_code, true);
 			ERR_FAIL_COND_V_MSG(exit_code != 0, err, output);
-			add_message(EXPORT_MESSAGE_INFO, TTR("Export"), TTR("nxlink OK"));
+			add_message(EXPORT_MESSAGE_INFO, TTRC("Export"), TTRC("nxlink OK"));
 		}
 	}
 
@@ -150,12 +151,12 @@ Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &
 }
 
 String EditorExportPlatformSwitch::get_template_file_name(const String &p_target, const String &p_arch) const {
-	return "switch_" + p_target + ".nro";
+	return "switch_" + p_target + ".arm64";
 }
 
 List<String> EditorExportPlatformSwitch::get_binary_extensions(const Ref<EditorExportPreset> &p_preset) const {
 	List<String> list;
-	list.push_back("nro");
+	list.push_back("arm64");
 	return list;
 }
 
@@ -233,15 +234,15 @@ int EditorExportPlatformSwitch::get_options_count() const {
 }
 
 String EditorExportPlatformSwitch::get_option_label(int p_index) const {
-	return (p_index) ? TTR("Stop and uninstall") : TTR("Run on remote Linux/BSD system");
+	return (p_index) ? TTRC("Stop and uninstall") : TTRC("Run on remote Linux/BSD system");
 }
 
 String EditorExportPlatformSwitch::get_option_tooltip(int p_index) const {
-	return (p_index) ? TTR("Stop and uninstall running project from the remote system") : TTR("Run exported project on remote Linux/BSD system");
+	return (p_index) ? TTRC("Stop and uninstall running project from the remote system") : TTRC("Run exported project on remote Linux/BSD system");
 }
 
 Error EditorExportPlatformSwitch::run(const Ref<EditorExportPreset> &p_preset, int p_device, int p_debug_flags) {
-	EditorProgress ep("run", TTR("Running..."), 5);
+	EditorProgress ep("run", TTRC("Running..."), 5);
 
 	return OK;
 }

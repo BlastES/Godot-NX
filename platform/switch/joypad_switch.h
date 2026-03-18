@@ -38,7 +38,6 @@
 
 #include <array>
 #include <vector>
-#include <types.h>
 
 typedef std::pair<std::vector<std::pair<uint8_t, JoyButton>>, std::vector<std::pair<uint8_t, JoyAxis>>> PadMappingSwitch; //<button_mappings><triggers>
 
