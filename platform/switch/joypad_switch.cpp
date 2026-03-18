@@ -34,54 +34,70 @@
 
 //when only both joy-con are use as a single controller (general case)
 const PadMappingSwitch JoypadSwitch::switch_joy_dual_button_map = {
-	{ HidNpadButton_A, JoyButton::A },
-	{ HidNpadButton_B, JoyButton::B },
-	{ HidNpadButton_X, JoyButton::X },
-	{ HidNpadButton_Y, JoyButton::Y },
-	{ HidNpadButton_StickL, JoyButton::LEFT_STICK },
-	{ HidNpadButton_StickR, JoyButton::RIGHT_STICK },
-	{ HidNpadButton_L, JoyButton::LEFT_SHOULDER },
-	{ HidNpadButton_R, JoyButton::RIGHT_SHOULDER },
-	{ HidNpadButton_ZL, JoyButton::PADDLE1 }, //using axis TRIGGER instead ?
-	{ HidNpadButton_ZR, JoyButton::PADDLE2 }, //using axis TRIGGER instead ?
-	{ HidNpadButton_Plus, JoyButton::START },
-	{ HidNpadButton_Minus, JoyButton::BACK },
-	{ HidNpadButton_Left, JoyButton::DPAD_LEFT },
-	{ HidNpadButton_Up, JoyButton::DPAD_UP },
-	{ HidNpadButton_Right, JoyButton::DPAD_RIGHT },
-	{ HidNpadButton_Down, JoyButton::DPAD_DOWN },
+	{
+		{ HidNpadButton_A, JoyButton::B },
+		{ HidNpadButton_B, JoyButton::A },
+		{ HidNpadButton_X, JoyButton::Y },
+		{ HidNpadButton_Y, JoyButton::X },
+		{ HidNpadButton_StickL, JoyButton::LEFT_STICK },
+		{ HidNpadButton_StickR, JoyButton::RIGHT_STICK },
+		{ HidNpadButton_L, JoyButton::LEFT_SHOULDER },
+		{ HidNpadButton_R, JoyButton::RIGHT_SHOULDER },
+		{ HidNpadButton_Plus, JoyButton::START },
+		{ HidNpadButton_Minus, JoyButton::BACK },
+		{ HidNpadButton_Left, JoyButton::DPAD_LEFT },
+		{ HidNpadButton_Up, JoyButton::DPAD_UP },
+		{ HidNpadButton_Right, JoyButton::DPAD_RIGHT },
+		{ HidNpadButton_Down, JoyButton::DPAD_DOWN }
+	},
+	{
+		{ HidNpadButton_ZL, JoyAxis::TRIGGER_LEFT },
+		{ HidNpadButton_ZR, JoyAxis::TRIGGER_RIGHT }
+	}
 };
 
 //when only right joy-con is use as a controller horizontally
 const PadMappingSwitch JoypadSwitch::switch_joy_right_button_map = {
-	{ HidNpadButton_A, JoyButton::B },
-	{ HidNpadButton_B, JoyButton::Y },
-	{ HidNpadButton_X, JoyButton::A },
-	{ HidNpadButton_Y, JoyButton::X },
-	{ HidNpadButton_ZR, JoyButton::MISC1 }, //not sure twhat to do with this button
-	{ HidNpadButton_Plus, JoyButton::START },
-	{ HidNpadButton_StickRLeft, JoyButton::DPAD_UP },
-	{ HidNpadButton_StickRUp, JoyButton::DPAD_RIGHT },
-	{ HidNpadButton_StickRRight, JoyButton::DPAD_DOWN },
-	{ HidNpadButton_StickRDown, JoyButton::DPAD_LEFT },
-	{ HidNpadButton_RightSL, JoyButton::LEFT_SHOULDER },
-	{ HidNpadButton_RightSR, JoyButton::RIGHT_SHOULDER }
+	{
+		{ HidNpadButton_A, JoyButton::A },
+		{ HidNpadButton_B, JoyButton::X },
+		{ HidNpadButton_X, JoyButton::B },
+		{ HidNpadButton_Y, JoyButton::Y },
+		{ HidNpadButton_ZR, JoyButton::MISC1 }, //not sure twhat to do with this button
+		{ HidNpadButton_Plus, JoyButton::START },
+		{ HidNpadButton_StickRLeft, JoyButton::DPAD_UP },
+		{ HidNpadButton_StickRUp, JoyButton::DPAD_RIGHT },
+		{ HidNpadButton_StickRRight, JoyButton::DPAD_DOWN },
+		{ HidNpadButton_StickRDown, JoyButton::DPAD_LEFT },
+		{ HidNpadButton_RightSL, JoyButton::LEFT_SHOULDER },
+		{ HidNpadButton_RightSR, JoyButton::RIGHT_SHOULDER }
+	},
+	{
+		{ HidNpadButton_RightSL, JoyAxis::TRIGGER_LEFT },
+		{ HidNpadButton_RightSR, JoyAxis::TRIGGER_RIGHT }
+	}
 };
 
 //when only left joy-con is use as a controller horizontally
 const PadMappingSwitch JoypadSwitch::switch_joy_left_button_map = {
-	{ HidNpadButton_ZL, JoyButton::MISC1 }, //not sure twhat to do with this button
-	{ HidNpadButton_Minus, JoyButton::START },
-	{ HidNpadButton_Left, JoyButton::B },
-	{ HidNpadButton_Up, JoyButton::Y },
-	{ HidNpadButton_Right, JoyButton::X },
-	{ HidNpadButton_Down, JoyButton::A },
-	{ HidNpadButton_StickLLeft, JoyButton::DPAD_DOWN },
-	{ HidNpadButton_StickLUp, JoyButton::DPAD_LEFT },
-	{ HidNpadButton_StickLRight, JoyButton::DPAD_RIGHT },
-	{ HidNpadButton_StickLDown, JoyButton::DPAD_RIGHT },
-	{ HidNpadButton_LeftSL, JoyButton::LEFT_SHOULDER },
-	{ HidNpadButton_LeftSR, JoyButton::RIGHT_SHOULDER }
+	{
+		{ HidNpadButton_ZL, JoyButton::MISC1 }, //not sure twhat to do with this button
+		{ HidNpadButton_Minus, JoyButton::START },
+		{ HidNpadButton_Left, JoyButton::A },
+		{ HidNpadButton_Up, JoyButton::X },
+		{ HidNpadButton_Right, JoyButton::Y },
+		{ HidNpadButton_Down, JoyButton::B },
+		{ HidNpadButton_StickLLeft, JoyButton::DPAD_DOWN },
+		{ HidNpadButton_StickLUp, JoyButton::DPAD_LEFT },
+		{ HidNpadButton_StickLRight, JoyButton::DPAD_UP },
+		{ HidNpadButton_StickLDown, JoyButton::DPAD_RIGHT },
+		{ HidNpadButton_LeftSL, JoyButton::LEFT_SHOULDER },
+		{ HidNpadButton_LeftSR, JoyButton::RIGHT_SHOULDER }
+	},
+	{
+		{ HidNpadButton_LeftSL, JoyAxis::TRIGGER_LEFT },
+		{ HidNpadButton_LeftSR, JoyAxis::TRIGGER_RIGHT }
+	}
 };
 
 void JoypadSwitch::initialize() {
@@ -95,7 +111,7 @@ void JoypadSwitch::initialize() {
 	// first controler initialized as is #1 AND handheld
 	padInitialize(&_pads[0], HidNpadIdType_No1, HidNpadIdType_Handheld);
 	// from 2 -> 8 controller controler initialized as is #N
-	for (uint i = 1; i < _pads.size(); i++) {
+	for (uint8_t i = 1; i < _pads.size(); i++) {
 		_pads[i].id = i;
 		padInitialize(&_pads[i], HidNpadIdType(i));
 	}
@@ -156,7 +172,7 @@ void JoypadSwitch::process() {
 
 	Input* input = Input::get_singleton();
 
-	for (uint i = 0; i < _pads.size(); i++) {
+	for (uint8_t i = 0; i < _pads.size(); i++) {
 		PadStateSwitch &pad = _pads[i];
 		padUpdate(&pad);
 
@@ -167,12 +183,21 @@ void JoypadSwitch::process() {
 			discover_pad(pad);
 		}
 
-		for (const auto &button : pad.mapping) {
+		for (const auto &button : pad.mapping.first) {
 			if (kDown & button.first) {
 				input->joy_button(pad.id, button.second, true);
 			}
 			if (kUp & button.first) {
 				input->joy_button(pad.id, button.second, false);
+			}
+		}
+		
+		for (const auto &button : pad.mapping.second) {
+			if (kDown & button.first) {
+				input->joy_axis(pad.id, button.second, true);
+			}
+			if (kUp & button.first) {
+				input->joy_axis(pad.id, button.second, false);
 			}
 		}
 
@@ -182,10 +207,10 @@ void JoypadSwitch::process() {
 		if (pad.style_set & HidNpadStyleTag_NpadJoyLeft) {
 			// only left stick available and rotated 90 anti-clock wise
 			input->joy_axis(i, JoyAxis::LEFT_Y, (float)(leftStick.x) / float(JOYSTICK_MAX));
-			input->joy_axis(i, JoyAxis::LEFT_X, -(float)(leftStick.y) / float(JOYSTICK_MAX));
+			input->joy_axis(i, JoyAxis::LEFT_X, (float)(leftStick.y) / float(JOYSTICK_MAX));
 		} else if (pad.style_set & HidNpadStyleTag_NpadJoyRight) {
 			// only left stick available and rotated 90 clock wise
-			input->joy_axis(i, JoyAxis::LEFT_Y, -(float)(rightStick.x) / float(JOYSTICK_MAX));
+			input->joy_axis(i, JoyAxis::LEFT_Y, (float)(rightStick.x) / float(JOYSTICK_MAX));
 			input->joy_axis(i, JoyAxis::LEFT_X, (float)(rightStick.y) / float(JOYSTICK_MAX));
 		} else {
 			// both sticks no rotations
