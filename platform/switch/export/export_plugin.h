@@ -3,12 +3,9 @@
 
 #include "core/io/file_access.h"
 #include "editor/editor_settings.h"
-#include "editor/export/editor_export.h"
 #include "editor/export/editor_export_plugin.h"
 #include "editor/export/editor_export_platform.h"
 #include "scene/resources/texture.h"
-
-#include "platform/switch/export/logo_svg.gen.h"
 
 #include "../switch_wrapper.h"
 
@@ -33,14 +30,14 @@ class EditorExportPlatformSwitch : public EditorExportPlatform {
     Mutex device_lock;
     Thread device_thread;
     volatile bool quit_request;
-    ExportPluginSwitch *export_plugin;
+    ExportPluginSwitch *export_pluggin;
 
     static void _device_poll_thread(void *ud);
 
     public:
         virtual void get_preset_features(const Ref<EditorExportPreset> &p_preset, List<String> *r_features);
         virtual void get_platform_features(List<String> *r_features);
-        virtual void get_export_options(List<ExportOption> *r_options);
+        virtual void get_export_options(List<String> *r_options);
 
         virtual String get_name() const;
         virtual String get_os_name() const;
@@ -62,7 +59,7 @@ class EditorExportPlatformSwitch : public EditorExportPlatform {
         virtual Error export_pack(const Ref<EditorExportPreset> &p_preset, bool p_debug, const String &p_path, int p_flags = 0);
         virtual Error export_project(const Ref<EditorExportPreset> &p_preset, bool p_debug, const String &p_path, int p_flags = 0);
 
-        void copy_chunked(Ref<FileAccess> src, Ref<FileAccess> dst, size_t len, size_t chunk_size = 0x100000);
+        void copy_chunked(FileAccess *src, FileAccess *dst, size_t len, size_t chunk_size = 0x100000);
         
         Error create_nro(const String &template_path, const String &output_path, NacpStruct *nacp, String &icon_path, String &romfs_path);
         void create_nacp(NacpStruct *nacp, String &title, String &author, String &version);
