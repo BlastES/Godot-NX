@@ -75,15 +75,13 @@ def get_flags():
         ("builtin_miniupnpc", False),
         ("builtin_pcre2", False),
         ("builtin_squish", True),
-        ("builtin_graphite", True),
-        ("builtin_harfbuzz", True),
         ("builtin_zlib", True),
-        ("builtin_zstd", True),
+        ("builtin_zstd", False),
         ("builtin_embree", False),
     ]
 
 
-def configure(env: "Enviroment"):
+def configure(env):
     env["CC"] = "aarch64-none-elf-gcc"
     env["CXX"] = "aarch64-none-elf-g++"
     env["LD"] = "aarch64-none-elf-ld"
@@ -166,38 +164,10 @@ def configure(env: "Enviroment"):
 
     # freetype depends on libpng and zlib, so bundling one of them while keeping others
     # as shared libraries leads to weird issues
-    ft_linked_deps = [
-        env["builtin_freetype"],
-        env["builtin_libpng"],
-        env["builtin_zlib"],
-        env["builtin_graphite"],
-        env["builtin_harfbuzz"],
-    ]
-    if (not all(ft_linked_deps)) and any(ft_linked_deps):  # All or nothing.
-        print(
-            "These libraries should be either all builtin, or all system provided:\n"
-            "freetype, libpng, zlib, graphite, harfbuzz.\n"
-            "Please specify `builtin_<name>=no` for all of them, or none."
-        )
-        sys.exit(255)
-
-    if not env["builtin_freetype"]:
-        env.ParseConfig("aarch64-none-elf-pkg-config freetype2 --cflags --libs")
-
-    if not env["builtin_graphite"]:
-        env.ParseConfig("aarch64-none-elf-pkg-config graphite2 --cflags --libs")
-    
-    if not env["builtin_harfbuzz"]:
-        env.ParseConfig("aarch64-none-elf-pkg-config harfbuzz harfbuzz-icu --cflags --libs")
-
-    if not env["builtin_libpng"]:
-        env.ParseConfig("aarch64-none-elf-pkg-config libpng16 --cflags --libs")
-    
-    
-    #if env["builtin_freetype"] or env["builtin_libpng"] or env["builtin_zlib"]:
-    #    env["builtin_freetype"] = True
-    #    env["builtin_libpng"] = True
-    #    env["builtin_zlib"] = True
+    if env["builtin_freetype"] or env["builtin_libpng"] or env["builtin_zlib"]:
+        env["builtin_freetype"] = True
+        env["builtin_libpng"] = True
+        env["builtin_zlib"] = True
 
     if not env["builtin_enet"]:
         env.ParseConfig("aarch64-none-elf-pkg-config libenet --cflags --libs")
