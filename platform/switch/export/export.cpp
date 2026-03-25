@@ -1,10 +1,6 @@
 #include "export.h"
 #include "export_plugin.h"
 
-void register_switch_exporter_types(){
-    GDREGISTER_VIRTUAL_CLASS(EditorExportPlatformSwitch);
-}
-
 void register_switch_exporter(){
     String exe_ext;
     if (OS::get_singleton()->get_name() == "Windows"){
@@ -19,4 +15,3 @@ void register_switch_exporter(){
 	Ref<EditorExportPlatformSwitch> exporter = Ref<EditorExportPlatformSwitch>();
 	EditorExport::get_singleton()->add_export_platform(exporter);
 }
-

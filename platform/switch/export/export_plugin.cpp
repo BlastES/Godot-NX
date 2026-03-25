@@ -60,7 +60,7 @@ void EditorExportPlatformSwitch::_device_poll_thread(void *ud){
 		}
 }
 
-void EditorExportPlatformSwitch::get_preset_features(const Ref<EditorExportPreset> &p_preset, List<String> *r_features) const{
+void EditorExportPlatformSwitch::get_preset_features(const Ref<EditorExportPreset> &p_preset, List<String> *r_features){
     String driver = ProjectSettings::get_singleton()->get("rendering/quality/driver/driver_name");
     if (driver == "GLES2"){
         r_features->push_back("etc");
@@ -72,11 +72,11 @@ void EditorExportPlatformSwitch::get_preset_features(const Ref<EditorExportPrese
     }
 }
 
-void EditorExportPlatformSwitch::get_platform_features(List<String> *r_features) const{
+void EditorExportPlatformSwitch::get_platform_features(List<String> *r_features) {
     r_features->push_back("mobile");
 }
 
-void EditorExportPlatformSwitch::get_export_options(List<ExportOption> *r_options) const{
+void EditorExportPlatformSwitch::get_export_options(List<ExportOption> *r_options){
     String title = ProjectSettings::get_singleton()->get("application/config/name");
 		r_options->push_back(ExportOption(PropertyInfo(Variant::BOOL, "application/fused_build"), false));
 		r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "application/custom_editor_id"), ""));
@@ -100,10 +100,6 @@ Ref<Texture2D> EditorExportPlatformSwitch::get_logo() const{
 
 Ref<Texture2D> EditorExportPlatformSwitch::get_run_icon() const{
     return logo;
-}
-
-String EditorExportPlatformSwitch::get_template_file_name(const String &p_target, const String &p_arch) const{
-    return "switch_" + p_target + ".nro";
 }
 
 bool EditorExportPlatformSwitch::poll_export(){
@@ -211,7 +207,7 @@ Error EditorExportPlatformSwitch::run(const Ref<EditorExportPreset> &p_preset, i
 
 }
 
-bool EditorExportPlatformSwitch::can_export(const Ref<EditorExportPreset> &p_preset, String &r_error, bool &r_missing_templates, bool p_debug) const{
+bool EditorExportPlatformSwitch::can_export(const Ref<EditorExportPreset> &p_preset, String &r_error, bool &r_missing_templates, bool p_debug = false) const{
     String err;
     r_missing_templates =
             find_export_template(TEMPLATE_RELEASE) == String() ||
@@ -240,49 +236,7 @@ List<String> EditorExportPlatformSwitch::get_binary_extensions(const Ref<EditorE
 void EditorExportPlatformSwitch::resolve_platform_feature_priorities(const Ref<EditorExportPreset> &p_preset, HashSet<String> &p_features){
 }
 
-bool EditorExportPlatformSwitch::get_export_option_visibility(const EditorExportPreset *p_preset, const String &p_option) const{
-    if (p_preset) {
-		// Hide devkitpro options.
-		bool devprokit = p_preset->get("devkitpro/enabled");
-		if (!devprokit && p_option != "devkitpro/enabled" && p_option.begins_with("devkitpro/")) {
-			return false;
-		}
-		// Hide nxlink options.
-		bool nxlink = p_preset->get("nxlink/enabled");
-		if (!nxlink && p_option != "nxlink/enabled" && p_option.begins_with("nxlink/")) {
-			return false;
-		}
-		// we do not support any of the following so hide them
-		if (p_option == "binary_format/embed_pck") {
-			return false;
-		}
-		if (p_option == "debug/export_console_wrapper") {
-			return false;
-		}
-		if (p_option.begins_with("custom_template/")) {
-			return false;
-		}
-	}
-	return true;
-}
-
-String EditorExportPlatformSwitch::get_export_option_warning(const EditorExportPreset *p_preset, const StringName &p_name) const{
-    if (p_preset) {
-        //TODO test if devkits path exists
-        return "";
-    }
-    return "";
-}
-
-bool EditorExportPlatformSwitch::has_valid_export_configuration(const Ref<EditorExportPreset> &p_preset, String &r_error, bool &r_missing_templates, bool p_debug) const{
-    return true;
-}
-
-bool EditorExportPlatformSwitch::has_valid_project_configuration(const Ref<EditorExportPreset> &p_preset, String &r_error) const{
-    return true;
-}
-
-Error EditorExportPlatformSwitch::export_pack(const Ref<EditorExportPreset> &p_preset, bool p_debug, const String &p_path, int p_flags){
+Error EditorExportPlatformSwitch::export_pack(const Ref<EditorExportPreset> &p_preset, bool p_debug, const String &p_path, int p_flags = 0){
     // XXX i hate this - we have to do this _before_ the export notifier
     String custom_editor_id = p_preset->get("application/custom_editor_id");
     export_plugin->editor_id_vec.clear();
@@ -300,7 +254,7 @@ Error EditorExportPlatformSwitch::export_pack(const Ref<EditorExportPreset> &p_p
     return save_pack(p_preset, false, p_path);
 }
 
-Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &p_preset, bool p_debug, const String &p_path, int p_flags){
+Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &p_preset, bool p_debug, const String &p_path, int p_flags = 0){
     // XXX i hate this - we have to do this _before_ the export notifier
     String custom_editor_id = p_preset->get("application/custom_editor_id");
     export_plugin->editor_id_vec.clear();
@@ -403,7 +357,7 @@ Error EditorExportPlatformSwitch::export_project(const Ref<EditorExportPreset> &
     return err;
 }
 
-void EditorExportPlatformSwitch::copy_chunked(Ref<FileAccess> src, Ref<FileAccess> dst, size_t len, size_t chunk_size){
+void EditorExportPlatformSwitch::copy_chunked(Ref<FileAccess> src, Ref<FileAccess> dst, size_t len, size_t chunk_size = 0x100000){
     uint8_t *buffer = (uint8_t *)malloc(chunk_size);
     while (len > chunk_size) {
         size_t amt = src->get_buffer(buffer, chunk_size);
@@ -528,17 +482,13 @@ void EditorExportPlatformSwitch::create_nacp(NacpStruct *nacp, String &title, St
 }
 
 EditorExportPlatformSwitch::EditorExportPlatformSwitch(){
-    if (EditorNode::get_singleton()) {
-#ifdef MODULE_SVG_ENABLED
-		Ref<Image> img = memnew(Image);
-		const bool upsample = !Math::is_equal_approx(Math::round(EDSCALE), EDSCALE);
+    Ref<ImageTexture> img(_switch_logo_svg);
+    logo->create_from_image(img);
 
-		ImageLoaderSVG img_loader;
-		img_loader.create_image_from_string(img, _switch_logo_svg, EDSCALE, upsample, false);
-		set_logo(ImageTexture::create_from_image(img));
+    devices_changed = true;
+    quit_request = false;
+    device_thread.start(_device_poll_thread, this);
 
-		img_loader.create_image_from_string(img, _switch_run_icon_svg, EDSCALE, upsample, false);
-		run_icon = ImageTexture::create_from_image(img);
-#endif
-	}
+    export_plugin = memnew(ExportPluginSwitch);
+    EditorExport::get_singleton()->add_export_plugin(export_plugin);
 }
