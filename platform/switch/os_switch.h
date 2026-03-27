@@ -34,6 +34,7 @@
 #include "core/crypto/crypto_core.h"
 #include "drivers/unix/os_unix.h"
 
+#include "audio_driver_switch.h"
 #include "joypad_switch.h"
 #include "keyboard_switch.h"
 #include "touch_screen_switch.h"
@@ -50,6 +51,8 @@ class OS_Switch : public OS_Unix {
 	JoypadSwitch* _joypads = nullptr;
 	KeyboardSwitch* _keyboard = nullptr;
 	TouchScreenSwitch* _touch_screen = nullptr;
+	AudioDriverSwitch audio_driver;
+
 
 private:
 protected:
@@ -96,6 +99,9 @@ public:
 	virtual String get_version() const override { return ""; };
 
 	virtual MainLoop *get_main_loop() const override { return _main_loop; }
+
+	virtual int get_audio_driver_count() const { return 1; };
+	virtual AudioDriver *get_audio_driver(int p_driver) const { return const_cast<AudioDriverSwitch*>(&audio_driver); }
 
 	OS_Switch(const std::vector<std::string> &args);
 	virtual ~OS_Switch();

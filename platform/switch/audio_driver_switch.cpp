@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  audio_driver_switch.cpp                                               */
+/*  audio_driver_audren.cpp                                               */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -37,17 +37,17 @@
 #include <malloc.h>
 
 static const AudioRendererConfig arConfig = {
-    .output_rate = AudioRendererOutputRate_48kHz,
-    .num_voices = 24,
-    .num_effects = 0,
-    .num_sinks = 1,
-    .num_mix_objs = 1,
-    .num_mix_buffers = 2,
+	.output_rate = AudioRendererOutputRate_48kHz,
+	.num_voices = 24,
+	.num_effects = 0,
+	.num_sinks = 1,
+	.num_mix_objs = 1,
+	.num_mix_buffers = 2,
 };
 
-Error AudioDriverSwitch::init_device(){
-    int latency = GLOBAL_GET("audio/output_latency");
-	mix_rate = GLOBAL_GET("audio/mix_rate");
+Error AudioDriverSwitch::init_device() {
+	int latency = GLOBAL_GET("audio/driver/output_latency");
+	mix_rate = GLOBAL_GET("audio/driver/mix_rate");
 	channels = 2;
 	speaker_mode = SPEAKER_MODE_STEREO;
 	buffer_size = closest_power_of_2(latency * mix_rate / 1000);
@@ -180,19 +180,19 @@ AudioDriver::SpeakerMode AudioDriverSwitch::get_speaker_mode() const {
 	return speaker_mode;
 }
 
-PackedStringArray AudioDriverSwitch::get_output_device_list() {
-	PackedStringArray list;
+Array AudioDriverSwitch::get_device_list() {
+	Array list;
 	list.push_back("Default");
 	return list;
 }
 
-String AudioDriverSwitch::get_output_device() {
+String AudioDriverSwitch::get_device() {
 	return device_name;
 }
 
-void AudioDriverSwitch::set_output_device(const String &p_name) {
+void AudioDriverSwitch::set_device(String device) {
 	lock();
-	new_device = p_name;
+	new_device = device;
 	unlock();
 }
 

@@ -133,6 +133,8 @@ OS_Switch::OS_Switch(const std::vector<std::string> &args) :
 	_joypads = new JoypadSwitch();
 	_touch_screen = new TouchScreenSwitch();
 	_keyboard = KeyboardSwitch::get();
+	AudioDriverManager::add_driver(&audio_driver);
+
 
 	print("OS_Switch\n");
 }
