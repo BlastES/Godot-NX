@@ -31,12 +31,62 @@
 #ifndef AUDIO_DRIVER_SWITCH_H
 #define AUDIO_DRIVER_SWITCH_H
 
+#include "servers/audio_server.h"
 #include "switch_wrapper.h"
 
-class AudioDriverSwitch {
-private:
-protected:
+#include "core/os/thread.h"
+#include "core/os/mutex.h"
+
+class AudioDriverSwitch : public AudioDriver{
+Thread thread;
+Mutex mutex;
+
+LibnxAudioDriver audren_driver;
+AudioDriverWaveBuf audren_buffers[2];
+size_t audren_pool_size;
+void *audren_pool_ptr;
+unsigned int audren_buffer_size;
+unsigned int buffer_size;
+Vector<int32_t> samples_in;
+Vector<int16_t> samples_out;
+
+String device_name;
+String new_device;
+
+Error init_device();
+void finish_device();
+
+static void thread_func(void *p_udata);
+
+unsigned int mix_rate;
+SpeakerMode speaker_mode;
+int channels;
+
+bool active;
+bool thread_exited;
+mutable bool exit_thread;
+
+
 public:
+	const char *get_name() const{
+		return "AUDREN";
+	};
+
+	virtual Error init() override;
+	virtual void start() override;
+	virtual int get_mix_rate() const override;
+	virtual SpeakerMode get_speaker_mode() const override;
+
+	virtual void lock() override;
+	virtual void unlock() override;
+	virtual void finish() override;
+
+	virtual PackedStringArray get_output_device_list() override;
+	virtual String get_output_device() override;
+	virtual void set_output_device(const String &p_name) override;
+	
+
+
 	AudioDriverSwitch();
 	virtual ~AudioDriverSwitch();
 };
