@@ -48,11 +48,11 @@ const PadMappingSwitch JoypadSwitch::switch_joy_dual_button_map = {
 		{ HidNpadButton_Left, JoyButton::DPAD_LEFT },
 		{ HidNpadButton_Up, JoyButton::DPAD_UP },
 		{ HidNpadButton_Right, JoyButton::DPAD_RIGHT },
-		{ HidNpadButton_Down, JoyButton::DPAD_DOWN }
+		{ HidNpadButton_Down, JoyButton::DPAD_DOWN },
 	},
 	{
 		{ HidNpadButton_ZL, JoyAxis::TRIGGER_LEFT },
-		{ HidNpadButton_ZR, JoyAxis::TRIGGER_RIGHT }
+		{ HidNpadButton_ZR, JoyAxis::TRIGGER_RIGHT },
 	}
 };
 
@@ -63,40 +63,37 @@ const PadMappingSwitch JoypadSwitch::switch_joy_right_button_map = {
 		{ HidNpadButton_B, JoyButton::X },
 		{ HidNpadButton_X, JoyButton::B },
 		{ HidNpadButton_Y, JoyButton::Y },
-		{ HidNpadButton_ZR, JoyButton::MISC1 }, //not sure twhat to do with this button
+		{ HidNpadButton_StickR, JoyButton::RIGHT_STICK },
+		{ HidNpadButton_R, JoyButton::PADDLE1 },
+		{ HidNpadButton_ZR, JoyButton::PADDLE2 },
 		{ HidNpadButton_Plus, JoyButton::START },
-		{ HidNpadButton_StickRLeft, JoyButton::DPAD_UP },
-		{ HidNpadButton_StickRUp, JoyButton::DPAD_RIGHT },
-		{ HidNpadButton_StickRRight, JoyButton::DPAD_DOWN },
-		{ HidNpadButton_StickRDown, JoyButton::DPAD_LEFT },
 		{ HidNpadButton_RightSL, JoyButton::LEFT_SHOULDER },
-		{ HidNpadButton_RightSR, JoyButton::RIGHT_SHOULDER }
+		{ HidNpadButton_RightSR, JoyButton::RIGHT_SHOULDER },
 	},
 	{
 		{ HidNpadButton_RightSL, JoyAxis::TRIGGER_LEFT },
-		{ HidNpadButton_RightSR, JoyAxis::TRIGGER_RIGHT }
+		{ HidNpadButton_RightSR, JoyAxis::TRIGGER_RIGHT },
 	}
 };
 
 //when only left joy-con is use as a controller horizontally
 const PadMappingSwitch JoypadSwitch::switch_joy_left_button_map = {
 	{
-		{ HidNpadButton_ZL, JoyButton::MISC1 }, //not sure twhat to do with this button
-		{ HidNpadButton_Minus, JoyButton::START },
+		
 		{ HidNpadButton_Left, JoyButton::A },
 		{ HidNpadButton_Up, JoyButton::X },
-		{ HidNpadButton_Right, JoyButton::Y },
 		{ HidNpadButton_Down, JoyButton::B },
-		{ HidNpadButton_StickLLeft, JoyButton::DPAD_DOWN },
-		{ HidNpadButton_StickLUp, JoyButton::DPAD_LEFT },
-		{ HidNpadButton_StickLRight, JoyButton::DPAD_UP },
-		{ HidNpadButton_StickLDown, JoyButton::DPAD_RIGHT },
+		{ HidNpadButton_Right, JoyButton::Y },
+		{ HidNpadButton_StickL, JoyButton::RIGHT_STICK },
+		{ HidNpadButton_L, JoyButton::PADDLE1},
+		{ HidNpadButton_ZL, JoyButton::PADDLE2 },
+		{ HidNpadButton_Minus, JoyButton::START },
 		{ HidNpadButton_LeftSL, JoyButton::LEFT_SHOULDER },
-		{ HidNpadButton_LeftSR, JoyButton::RIGHT_SHOULDER }
+		{ HidNpadButton_LeftSR, JoyButton::RIGHT_SHOULDER },
 	},
 	{
 		{ HidNpadButton_LeftSL, JoyAxis::TRIGGER_LEFT },
-		{ HidNpadButton_LeftSR, JoyAxis::TRIGGER_RIGHT }
+		{ HidNpadButton_LeftSR, JoyAxis::TRIGGER_RIGHT },
 	}
 };
 
@@ -117,59 +114,61 @@ void JoypadSwitch::initialize() {
 	}
 }
 
-void JoypadSwitch::discover_pad(PadStateSwitch &pad) {
-	print_line("JoypadSwitch::discover_pad(" + String::num(pad.id) + ")");
+void JoypadSwitch::open_pad(PadStateSwitch &pad) {
+	print_line("JoypadSwitch::open_pad(" + String::num(pad.id) + ")");
+	print_line("open pads size: " + _pads.size());
 
 	pad.initialized = true;
 	bool solo = false;
-	String joy_name = "switch-pad-" + String::num(pad.id);
+	pad.name = "switch-pad-" + String::num(pad.id);
 	if (pad.style_set & HidNpadStyleTag_NpadJoyLeft) {
 		pad.mapping = switch_joy_left_button_map;
-		joy_name += "::solo-left";
+		pad.name += "::solo-left";
 		solo = true;
 	} else if (pad.style_set & HidNpadStyleTag_NpadJoyRight) {
 		pad.mapping = switch_joy_right_button_map;
-		joy_name += "::solo-right";
+		pad.name += "::solo-right";
 		solo = true;
 	} else if (pad.style_set & HidNpadStyleTag_NpadJoyDual) {
 		pad.mapping = switch_joy_dual_button_map;
-		joy_name += "::dual";
+		pad.name += "::dual";
 	} else if (pad.style_set & HidNpadStyleTag_NpadFullKey) {
 		pad.mapping = switch_joy_dual_button_map;
-		joy_name += "::pro";
+		pad.name += "::pro";
 	} else if (pad.style_set & HidNpadStyleTag_NpadHandheld) {
 		pad.mapping = switch_joy_dual_button_map;
-		joy_name += "::handheld";
+		pad.name += "::handheld";
 	} else {
 		pad.mapping = switch_joy_dual_button_map;
-		joy_name += "::other";
+		pad.name += "::other";
 	}
 
 	if (solo) {
 		HidNpadControllerColor color;
 		hidGetNpadControllerColorSingle((HidNpadIdType)pad.id, &color);
-		joy_name += "::#" + String::num_int64(color.main, 16);
+		pad.name += "::#" + String::num_int64(color.main, 16);
 	} else {
 		HidNpadControllerColor color_l, color_r;
 		hidGetNpadControllerColorSplit((HidNpadIdType)pad.id, &color_l, &color_r);
-		joy_name += "::#" + String::num_int64(color_l.main, 16);
-		joy_name += "::#" + String::num_int64(color_r.main, 16);
+		pad.name += "::#" + String::num_int64(color_l.main, 16);
+		pad.name += "::#" + String::num_int64(color_r.main, 16);
 	}
 
-	Input::get_singleton()->joy_connection_changed(pad.id, true, joy_name);
+	Input::get_singleton()->joy_connection_changed(pad.id, true, pad.name);
 	std::cout << "joy_connection_changed pad(" << pad.id << ") "
-			  << "name(" << joy_name.utf8().get_data() << ") "
+			  << "name(" << pad.name.utf8().get_data() << ") "
 			  << "read_handheld(" << pad.read_handheld << ") "
 			  << "active_handheld(" << pad.active_handheld << ") "
 			  << "attributes(" << pad.attributes << ") "
 			  << "style_set(" << pad.style_set << ")" << std::endl;
 }
 
-void JoypadSwitch::dispatch(PadStateSwitch &pad) {
+void JoypadSwitch::close_pad(PadStateSwitch &pad) {
+	pad.initialized = false;
+	Input::get_singleton()->joy_connection_changed(pad.id, false, pad.name);
 }
 
 void JoypadSwitch::process() {
-
 	Input* input = Input::get_singleton();
 
 	for (uint8_t i = 0; i < _pads.size(); i++) {
@@ -180,7 +179,10 @@ void JoypadSwitch::process() {
 		u64 kUp = padGetButtonsUp(&pad);
 
 		if (!pad.initialized && kDown) {
-			discover_pad(pad);
+			open_pad(pad);
+		}
+		if (!padIsConnected(&pad) && pad.initialized){
+			close_pad(pad);
 		}
 
 		for (const auto &button : pad.mapping.first) {
@@ -192,12 +194,12 @@ void JoypadSwitch::process() {
 			}
 		}
 
-		for (const auto &button : pad.mapping.second) {
-			if (kDown & button.first) {
-				input->joy_axis(pad.id, button.second, 1);
+		for (const auto &axis : pad.mapping.second) {
+			if (kDown & axis.first) {
+				input->joy_axis(pad.id, axis.second, 1);
 			}
-			if (kUp & button.first) {
-				input->joy_axis(pad.id, button.second, 1);
+			if (kUp & axis.first) {
+				input->joy_axis(pad.id, axis.second, 0);
 			}
 		}
 

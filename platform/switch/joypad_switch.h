@@ -44,7 +44,8 @@ typedef std::pair<std::vector<std::pair<uint8_t, JoyButton>>, std::vector<std::p
 struct PadStateSwitch : public PadState {
 	bool initialized = false;
 	int id = 0;
-	PadMappingSwitch mapping = {};
+	String name;
+	PadMappingSwitch mapping;
 };
 
 class JoypadSwitch {
@@ -63,8 +64,8 @@ public:
 	static const PadMappingSwitch switch_joy_left_button_map;
 
 	void initialize();
-	void discover_pad(PadStateSwitch &pad);
-	void dispatch(PadStateSwitch &pad);
+	void open_pad(PadStateSwitch &pad);
+	void close_pad(PadStateSwitch &pad);
 
 	void process();
 
