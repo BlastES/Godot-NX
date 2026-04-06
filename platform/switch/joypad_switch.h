@@ -39,7 +39,7 @@
 #include <array>
 #include <vector>
 
-typedef std::pair<std::vector<std::pair<uint8_t, JoyButton>>, std::vector<std::pair<uint8_t, JoyAxis>>> PadMappingSwitch; //<button_mappings><triggers>
+typedef std::pair<std::vector<std::pair<uint64_t, JoyButton>>, std::vector<std::pair<uint8_t, JoyAxis>>> PadMappingSwitch; //<button_mappings><triggers>
 
 struct PadStateSwitch : public PadState {
 	bool initialized = false;

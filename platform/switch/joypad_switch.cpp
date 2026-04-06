@@ -63,7 +63,7 @@ const PadMappingSwitch JoypadSwitch::switch_joy_right_button_map = {
 		{ HidNpadButton_B, JoyButton::X },
 		{ HidNpadButton_X, JoyButton::B },
 		{ HidNpadButton_Y, JoyButton::Y },
-		{ HidNpadButton_StickR, JoyButton::RIGHT_STICK },
+		{ HidNpadButton_StickR, JoyButton::LEFT_STICK },
 		{ HidNpadButton_R, JoyButton::PADDLE1 },
 		{ HidNpadButton_ZR, JoyButton::PADDLE2 },
 		{ HidNpadButton_Plus, JoyButton::START },
@@ -84,7 +84,7 @@ const PadMappingSwitch JoypadSwitch::switch_joy_left_button_map = {
 		{ HidNpadButton_Up, JoyButton::X },
 		{ HidNpadButton_Down, JoyButton::B },
 		{ HidNpadButton_Right, JoyButton::Y },
-		{ HidNpadButton_StickL, JoyButton::RIGHT_STICK },
+		{ HidNpadButton_StickL, JoyButton::LEFT_STICK },
 		{ HidNpadButton_L, JoyButton::PADDLE1},
 		{ HidNpadButton_ZL, JoyButton::PADDLE2 },
 		{ HidNpadButton_Minus, JoyButton::START },
@@ -196,7 +196,7 @@ void JoypadSwitch::process() {
 
 		for (const auto &axis : pad.mapping.second) {
 			if (kDown & axis.first) {
-				input->joy_axis(pad.id, axis.second, 1);
+				input->joy_axis(pad.id, axis.second, 10000);
 			}
 			if (kUp & axis.first) {
 				input->joy_axis(pad.id, axis.second, 0);
