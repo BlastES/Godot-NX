@@ -58,8 +58,10 @@ public:
 
 	//when only both joy-con are use as a single controller (general case)
 	static const PadMappingSwitch switch_joy_dual_button_map;
+
 	//when only right joy-con is use as a controller horizontally
 	static const PadMappingSwitch switch_joy_right_button_map;
+	
 	//when only left joy-con is use as a controller horizontally
 	static const PadMappingSwitch switch_joy_left_button_map;
 
