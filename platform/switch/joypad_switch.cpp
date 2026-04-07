@@ -196,7 +196,7 @@ void JoypadSwitch::process() {
 
 		for (const auto &axis : pad.mapping.second) {
 			if (kDown & axis.first) {
-				input->joy_axis(pad.id, axis.second, 10000);
+				input->joy_axis(pad.id, axis.second, 1);
 			}
 			if (kUp & axis.first) {
 				input->joy_axis(pad.id, axis.second, 0);
