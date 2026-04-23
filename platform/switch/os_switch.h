@@ -101,7 +101,8 @@ public:
 	virtual MainLoop *get_main_loop() const override { return _main_loop; }
 
 	virtual int get_audio_driver_count() const { return 1; };
-	virtual AudioDriver *get_audio_driver(int p_driver) const { return const_cast<AudioDriverSwitch*>(&audio_driver); }
+	virtual AudioDriver *get_audio_driver(int p_driver) const { return const_cast<AudioDriverSwitch*>(&audio_driver); };
+	virtual JoypadSwitch *get_joypad_driver() { return _joypads; };
 
 	OS_Switch(const std::vector<std::string> &args);
 	virtual ~OS_Switch();

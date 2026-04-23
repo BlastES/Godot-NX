@@ -63,6 +63,9 @@ int main(int argc, char *argv[]) {
 			os.run();
 		}
 		Main::cleanup();
+		socketExit();
+		plExit();
+		romfsExit();
 	}
 	os.print("godot switch exit\n");
 	return 0;

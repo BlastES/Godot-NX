@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  joypad_switch.h                                                       */
+/*  api.cpp                                                               */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,52 +28,61 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOYPAD_SWITCH_H
-#define JOYPAD_SWITCH_H
+#include "api.h"
 
+#ifdef SWITCH_ENABLED
+#include "os_switch.h"
 #include "switch_wrapper.h"
+#endif
+#include "switch_singleton.h"
 
-#include <core/input/input.h>
-#include <core/input/input_enums.h>
+#include "core/config/engine.h"
 
-#include <array>
-#include <vector>
+static Switch *switch_singleton;
 
-typedef std::pair<std::vector<std::pair<uint64_t, JoyButton>>, std::vector<std::pair<uint64_t, JoyAxis>>> PadMappingSwitch; //<button_mappings><triggers>
+void register_switch_api(){
+    GDREGISTER_ABSTRACT_CLASS(Switch);
+    switch_singleton = memnew(Switch);
+    Engine::get_singleton()->add_singleton(Engine::Singleton("Switch", switch_singleton));
+}
 
-struct PadStateSwitch : public PadState {
-	bool initialized = false;
-	int id = 0;
-	String name;
-	PadMappingSwitch mapping;
-};
+void unregister_switch_api(){
+    memdelete(switch_singleton);
+}
 
-class JoypadSwitch {
-private:
-	std::array<PadStateSwitch, 8> _pads; //switch support up to 8 controllers
+Switch *Switch::singleton = nullptr;
 
-protected:
-public:
-	PadStateSwitch &get_pad(int i = 0) { return _pads[i]; }
+Switch *Switch::get_singleton(){
+    return singleton;
+}
 
-	//when only both joy-con are use as a single controller (general case)
-	static const PadMappingSwitch switch_joy_dual_button_map;
+Switch::Switch(){
+    ERR_FAIL_COND_MSG(singleton != nullptr, "Switch singleton already exist.");
+    singleton = this;
+    print_line("Switch singleton initialize");
+}
 
-	//when only right joy-con is use as a controller horizontally
-	static const PadMappingSwitch switch_joy_right_button_map;
-	
-	//when only left joy-con is use as a controller horizontally
-	static const PadMappingSwitch switch_joy_left_button_map;
+Switch::~Switch() {}
 
-	void initialize();
-	void open_pad(PadStateSwitch &pad);
-	void close_pad(PadStateSwitch &pad);
-	void close_all();
+void Switch::_bind_methods(){
+    ClassDB::bind_method(D_METHOD("open_gamepad_applet", "min_players", "max_players", "single_mode", "dual_joy"), &Switch::open_gamepad_applet, DEFVAL(1), DEFVAL(4), DEFVAL(true), DEFVAL(true));
+}
 
-	void process();
+void Switch::open_gamepad_applet(int p_min_players, int p_max_players, bool p_single_mode, bool p_dual_joy){
+    ERR_FAIL_COND_MSG(p_min_players > p_max_players || p_min_players < 0, "min_players must be >=0 and <=max_players");
+    ERR_FAIL_COND_MSG(p_max_players > 8, "max_players must be >=min_players and <=8");
 
-	JoypadSwitch();
-	virtual ~JoypadSwitch() = default;
-};
+#ifdef SWITCH_ENABLED
+    HidLaControllerSupportArg arg;
+    HidLaControllerSupportResultInfo result;
 
-#endif // JOYPAD_SWITCH_H
+    hidLaCreateControllerSupportArg(&arg);
+
+    arg.hdr.player_count_min = p_min_players;
+    arg.hdr.player_count_max = p_max_players;
+    arg.hdr.enable_single_mode = p_single_mode;
+    arg.hdr.enable_permit_joy_dual= p_dual_joy;
+    
+    hidLaShowControllerSupportForSystem(&result, &arg, false);
+#endif
+}

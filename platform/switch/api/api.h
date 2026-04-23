@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  joypad_switch.h                                                       */
+/*  api.h                                                                 */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,52 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOYPAD_SWITCH_H
-#define JOYPAD_SWITCH_H
+#ifndef SWITCH_API_H
+#define SWITCH_API_H
 
-#include "switch_wrapper.h"
+void register_switch_api();
+void unregister_switch_api();
 
-#include <core/input/input.h>
-#include <core/input/input_enums.h>
-
-#include <array>
-#include <vector>
-
-typedef std::pair<std::vector<std::pair<uint64_t, JoyButton>>, std::vector<std::pair<uint64_t, JoyAxis>>> PadMappingSwitch; //<button_mappings><triggers>
-
-struct PadStateSwitch : public PadState {
-	bool initialized = false;
-	int id = 0;
-	String name;
-	PadMappingSwitch mapping;
-};
-
-class JoypadSwitch {
-private:
-	std::array<PadStateSwitch, 8> _pads; //switch support up to 8 controllers
-
-protected:
-public:
-	PadStateSwitch &get_pad(int i = 0) { return _pads[i]; }
-
-	//when only both joy-con are use as a single controller (general case)
-	static const PadMappingSwitch switch_joy_dual_button_map;
-
-	//when only right joy-con is use as a controller horizontally
-	static const PadMappingSwitch switch_joy_right_button_map;
-	
-	//when only left joy-con is use as a controller horizontally
-	static const PadMappingSwitch switch_joy_left_button_map;
-
-	void initialize();
-	void open_pad(PadStateSwitch &pad);
-	void close_pad(PadStateSwitch &pad);
-	void close_all();
-
-	void process();
-
-	JoypadSwitch();
-	virtual ~JoypadSwitch() = default;
-};
-
-#endif // JOYPAD_SWITCH_H
+#endif // WEB_SWITCH_H

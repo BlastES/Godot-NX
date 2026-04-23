@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  joypad_switch.h                                                       */
+/*  switch_singleton.h                                                    */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,52 +28,26 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JOYPAD_SWITCH_H
-#define JOYPAD_SWITCH_H
+#ifndef SWITCH_SINGLETON_H
+#define SWITCH_SINGLETON_H
 
-#include "switch_wrapper.h"
+#include "core/object/object.h"
+#include "core/object/class_db.h"
 
-#include <core/input/input.h>
-#include <core/input/input_enums.h>
+class Switch : public Object{
+        GDCLASS(Switch, Object);
 
-#include <array>
-#include <vector>
+        static Switch *singleton;
 
-typedef std::pair<std::vector<std::pair<uint64_t, JoyButton>>, std::vector<std::pair<uint64_t, JoyAxis>>> PadMappingSwitch; //<button_mappings><triggers>
-
-struct PadStateSwitch : public PadState {
-	bool initialized = false;
-	int id = 0;
-	String name;
-	PadMappingSwitch mapping;
+    protected:
+        static void _bind_methods();
+        
+    public:
+        static Switch *get_singleton();
+        
+        void open_gamepad_applet(int p_min_players = 1, int p_max_players = 4, bool p_single_mode = true, bool p_dual_joy = true);
+        Switch();
+        ~Switch();
 };
 
-class JoypadSwitch {
-private:
-	std::array<PadStateSwitch, 8> _pads; //switch support up to 8 controllers
-
-protected:
-public:
-	PadStateSwitch &get_pad(int i = 0) { return _pads[i]; }
-
-	//when only both joy-con are use as a single controller (general case)
-	static const PadMappingSwitch switch_joy_dual_button_map;
-
-	//when only right joy-con is use as a controller horizontally
-	static const PadMappingSwitch switch_joy_right_button_map;
-	
-	//when only left joy-con is use as a controller horizontally
-	static const PadMappingSwitch switch_joy_left_button_map;
-
-	void initialize();
-	void open_pad(PadStateSwitch &pad);
-	void close_pad(PadStateSwitch &pad);
-	void close_all();
-
-	void process();
-
-	JoypadSwitch();
-	virtual ~JoypadSwitch() = default;
-};
-
-#endif // JOYPAD_SWITCH_H
+#endif //SWITCH_SINGLETON_H

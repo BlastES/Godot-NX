@@ -120,7 +120,6 @@ void JoypadSwitch::initialize() {
 
 void JoypadSwitch::open_pad(PadStateSwitch &pad) {
 	print_line("JoypadSwitch::open_pad(" + String::num(pad.id) + ")");
-	print_line("open pads size: " + _pads.size());
 
 	pad.initialized = true;
 	bool solo = false;
@@ -170,6 +169,12 @@ void JoypadSwitch::open_pad(PadStateSwitch &pad) {
 void JoypadSwitch::close_pad(PadStateSwitch &pad) {
 	pad.initialized = false;
 	Input::get_singleton()->joy_connection_changed(pad.id, false, pad.name);
+}
+
+void JoypadSwitch::close_all(){
+	for(int i = 0; i < _pads.size(); i++){
+		close_pad(_pads[i]);
+	}
 }
 
 void JoypadSwitch::process() {
