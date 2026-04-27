@@ -34,7 +34,6 @@
 #include "core/object/object.h"
 #include "core/object/class_db.h"
 
-
 class Switch : public Object{
         GDCLASS(Switch, Object);
 
@@ -45,7 +44,7 @@ class Switch : public Object{
         
     public:
         static Switch *get_singleton();
-
+        
         void open_gamepad_applet(int p_min_players = 1, int p_max_players = 4, bool p_single_mode = true, bool p_dual_joy = true);
         Switch();
         ~Switch();

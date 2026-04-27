@@ -33,14 +33,12 @@
 #ifdef SWITCH_ENABLED
 #include "os_switch.h"
 #include "switch_wrapper.h"
-#include "../os_switch.h"
 #endif
 #include "switch_singleton.h"
 
 #include "core/config/engine.h"
 
 static Switch *switch_singleton;
-
 
 void register_switch_api(){
     GDREGISTER_ABSTRACT_CLASS(Switch);
@@ -85,15 +83,6 @@ void Switch::open_gamepad_applet(int p_min_players, int p_max_players, bool p_si
     arg.hdr.enable_single_mode = p_single_mode;
     arg.hdr.enable_permit_joy_dual= p_dual_joy;
     
-    LibnxThread t;  
-    OS_Switch::g_exit_requested = false;  
-    threadCreate(&t, OS_Switch::messageThread, NULL, NULL, 0x4000, 0x2C, -2);  
-    threadStart(&t);
-
     hidLaShowControllerSupportForSystem(&result, &arg, false);
-
-    OS_Switch::g_exit_requested = true;  // signal thread to stop if applet closed normally  
-    threadWaitForExit(&t);
-    threadClose(&t);
 #endif
 }

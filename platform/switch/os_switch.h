@@ -70,12 +70,6 @@ protected:
 	virtual void delete_main_loop() override;
 
 public:
-	static volatile bool g_exit_requested;
-	static AppletHookCookie g_hook_cookie;
-
-	static void onExitRequest(AppletHookType type, void *param);
-	static void messageThread(void *arg);
-
 	virtual bool _check_internal_feature_support(const String &p_feature) override;
 
 	String get_executable_path() const override { return String(_args[0].c_str()); }

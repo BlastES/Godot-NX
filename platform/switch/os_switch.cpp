@@ -37,9 +37,6 @@
 
 #include "os_switch.h"
 
-volatile bool OS_Switch::g_exit_requested = false;
-AppletHookCookie OS_Switch::g_hook_cookie;
-
 void OS_Switch::initialize() {
 	print("initialize\n");
 	initialize_core();
@@ -78,25 +75,6 @@ void OS_Switch::delete_main_loop() {
 	_main_loop = nullptr;
 }
 
-void OS_Switch::onExitRequest(AppletHookType type, void *param) {  
-    if (type == AppletHookType_OnExitRequest) {  
-        OS_Switch::g_exit_requested = true;  
-        // Unblock any running library applet so _hidLaShow can return  
-        appletTerminateAllLibraryApplets();  
-    }  
-}  
-
-void OS_Switch::messageThread(void *arg) {  
-    while (!OS_Switch::g_exit_requested) {  
-        // Wait for a message with a short timeout so we can check g_exit_requested  
-        if (R_SUCCEEDED(eventWait(appletGetMessageEvent(), 1000000ULL))) {  
-            u32 msg;  
-            if (R_SUCCEEDED(appletGetMessage(&msg)))  
-                appletProcessMessage(msg); // fires the hook if ExitRequest  
-        }  
-    }  
-}
-
 bool OS_Switch::_check_internal_feature_support(const String &p_feature) {
 	return false;
 }
@@ -128,8 +106,6 @@ void OS_Switch::run() {
 
 	_main_loop->initialize();
 
-	appletHook(&OS_Switch::g_hook_cookie, OS_Switch::onExitRequest, NULL);
-
 	while (appletMainLoop()) {
 		DisplayServer::get_singleton()->process_events(); // get rid of pending events
 
@@ -141,10 +117,8 @@ void OS_Switch::run() {
 			break;
 		}
 	}
-	print_line("exit: home menu or sleep mode");
 
 	_main_loop->finalize();
-	consoleExit(NULL);
 }
 
 OS_Switch::OS_Switch(const std::vector<std::string> &args) :
@@ -160,6 +134,7 @@ OS_Switch::OS_Switch(const std::vector<std::string> &args) :
 	_touch_screen = new TouchScreenSwitch();
 	_keyboard = KeyboardSwitch::get();
 	AudioDriverManager::add_driver(&audio_driver);
+
 
 	print("OS_Switch\n");
 }
