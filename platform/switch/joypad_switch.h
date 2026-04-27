@@ -68,7 +68,6 @@ public:
 	void initialize();
 	void open_pad(PadStateSwitch &pad);
 	void close_pad(PadStateSwitch &pad);
-	void close_all();
 
 	void process();
 
