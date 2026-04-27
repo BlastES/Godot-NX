@@ -38,13 +38,14 @@
 #include "os_switch.h"
 
 void OS_Switch::initialize() {
-	print("initialize\n");
+	print("OS_Switch::initialize\n");
 	initialize_core();
+	//initialize_joypads();
 	_random_generator.init();
 }
 
 void OS_Switch::finalize() {
-	print("finalize\n");
+	print("OS_Switch::finalize\n");
 	finalize_core();
 	delete_main_loop();
 }
@@ -106,6 +107,7 @@ void OS_Switch::run() {
 
 	_main_loop->initialize();
 
+	
 	while (appletMainLoop()) {
 		DisplayServer::get_singleton()->process_events(); // get rid of pending events
 
@@ -117,15 +119,11 @@ void OS_Switch::run() {
 			break;
 		}
 	}
-
 	_main_loop->finalize();
 }
 
 OS_Switch::OS_Switch(const std::vector<std::string> &args) :
 		_args(args) {
-	socketInitializeDefault();
-	nxlinkStdio();
-	romfsInit();
 
 	//this will provide the create_function to the Main to instanciate the DisplayServer
 	DisplayServerSwitch::register_NVN_driver();
@@ -141,9 +139,8 @@ OS_Switch::OS_Switch(const std::vector<std::string> &args) :
 
 OS_Switch::~OS_Switch() {
 	print("~OS_Switch\n");
-	romfsExit();
-	socketExit();
 
 	delete _joypads;
 	delete _touch_screen;
+
 }

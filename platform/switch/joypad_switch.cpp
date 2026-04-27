@@ -104,12 +104,13 @@ const PadMappingSwitch JoypadSwitch::switch_joy_left_button_map = {
 void JoypadSwitch::initialize() {
 	print_line("JoypadSwitch::initialize");
 
-	Input::get_singleton()->set_use_accumulated_input(false);
-	Input::get_singleton()->set_use_input_buffering(false);
-
 	//accept up to 8 controllers, all modes
 	padConfigureInput(_pads.size(), HidNpadStyleSet_NpadStandard);
 	// first controler initialized as is #1 AND handheld
+	print_line(padIsConnected(&_pads[0]));
+	if (padIsConnected(&_pads[0]) && !_pads[0].initialized){
+			open_pad(_pads[0]);
+		}
 	padInitialize(&_pads[0], HidNpadIdType_No1, HidNpadIdType_Handheld);
 	// from 2 -> 8 controller controler initialized as is #N
 	for (uint8_t i = 1; i < _pads.size(); i++) {
@@ -120,7 +121,6 @@ void JoypadSwitch::initialize() {
 
 void JoypadSwitch::open_pad(PadStateSwitch &pad) {
 	print_line("JoypadSwitch::open_pad(" + String::num(pad.id) + ")");
-	print_line("open pads size: " + _pads.size());
 
 	pad.initialized = true;
 	bool solo = false;

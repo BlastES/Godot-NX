@@ -44,6 +44,9 @@
 
 int main(int argc, char *argv[]) {
 	std::vector<std::string> args(argv, argv + argc);
+	socketInitializeDefault();
+	nxlinkStdio();
+	romfsInit();
 
 	OS_Switch os(args);
 
@@ -56,6 +59,8 @@ int main(int argc, char *argv[]) {
 		os.print("Main::setup\n");
 		Error err = Main::setup(argv[0], argc - 1, &argv[1]);
 		if (err != OK) {
+			romfsExit();
+			socketExit();
 			return 255;
 		}
 		os.print("Main::start\n");
@@ -65,5 +70,7 @@ int main(int argc, char *argv[]) {
 		Main::cleanup();
 	}
 	os.print("godot switch exit\n");
+	romfsExit();
+	socketExit();
 	return 0;
 }
