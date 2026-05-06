@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  keyboard_switch.h                                                     */
+/*  switch_singleton.h                                                    */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,51 +28,27 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef KEYBOARD_SWITCH_H
-#define KEYBOARD_SWITCH_H
+#ifndef SWITCH_SINGLETON_H
+#define SWITCH_SINGLETON_H
 
-#include "switch_wrapper.h"
+#include "core/object/object.h"
+#include "core/object/class_db.h"
 
-#include <core/input/input.h>
 
-struct KeyboardSwitchState {
-	bool _opened;
-	int _events = 0;
-	u32 _stringLen = 0;
-	s32 _cursorPos = 0;
+class Switch : public Object{
+        GDCLASS(Switch, Object);
+
+        static Switch *singleton;
+
+    protected:
+        static void _bind_methods();
+        
+    public:
+        void open_gamepad_applet(int p_players = 4, bool p_single_mode = false, bool p_dual_joy = true);
+        
+        static Switch *get_singleton();
+        Switch();
+        ~Switch();
 };
 
-class KeyboardSwitch {
-private:
-	SwkbdInline _keyboard;
-	KeyboardSwitchState _state;
-
-	static KeyboardSwitch* _instance;
-
-protected:
-	KeyboardSwitch();
-	virtual ~KeyboardSwitch();
-
-public:
-	static KeyboardSwitch* get_singleton();
-
-	void initialize();
-	void finalize();
-
-	const KeyboardSwitchState& state() const { return _state;}
-	KeyboardSwitchState& state() { return _state;}
-
-	void show(const String &current);
-	void hide();
-
-	void key_event(Key key, bool pressed = true);
-
-	void process();
-};
-
-void keyboard_string_changed_callback(const char *str, SwkbdChangedStringArg *arg);
-void keyboard_moved_cursor_callback(const char *str, SwkbdMovedCursorArg *arg);
-void keyboard_decided_enter_callback(const char *str, SwkbdDecidedEnterArg *arg);
-void keyboard_decided_cancel_callback();
-
-#endif // KEYBOARD_SWITCH_H
+#endif //SWITCH_SINGLETON_H

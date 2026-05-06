@@ -15,6 +15,7 @@ files = [
     "os_switch.cpp",
     "gl_manager_switch.cpp",
     "display_server_switch.cpp",
+    "switch_singleton.cpp",
 ]
 
 program = env.add_program("#bin/godot", files)

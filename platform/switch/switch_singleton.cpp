@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  keyboard_switch.h                                                     */
+/*  switch_singleton.cpp                                                  */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,51 +28,45 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef KEYBOARD_SWITCH_H
-#define KEYBOARD_SWITCH_H
+#include "api/switch_singleton.h"
 
 #include "switch_wrapper.h"
 
-#include <core/input/input.h>
+#ifdef SWITCH_ENABLED
 
-struct KeyboardSwitchState {
-	bool _opened;
-	int _events = 0;
-	u32 _stringLen = 0;
-	s32 _cursorPos = 0;
-};
+void Switch::open_gamepad_applet(int p_players, bool p_single_mode, bool p_dual_joy){
+    //ERR_FAIL_COND_MSG(p_min_players > p_max_players || p_min_players < 0, "min_players must be >=0 and <=max_players");
+    //ERR_FAIL_COND_MSG(p_max_players > 8, "max_players must be >=min_players and <=8");
+    
+    HidLaControllerSupportArg arg;
 
-class KeyboardSwitch {
-private:
-	SwkbdInline _keyboard;
-	KeyboardSwitchState _state;
+    hidLaCreateControllerSupportArg(&arg);
 
-	static KeyboardSwitch* _instance;
+    print_line(arg.hdr.player_count_min);
+    print_line(arg.hdr.player_count_max);
+    print_line(arg.hdr.enable_single_mode);
+    print_line(arg.hdr.enable_permit_joy_dual);
+    print_line("");
 
-protected:
-	KeyboardSwitch();
-	virtual ~KeyboardSwitch();
+    /*
+    arg.hdr.player_count_min = p_players;
+    arg.hdr.player_count_max = p_players;
+    arg.hdr.enable_single_mode = p_single_mode;
+    arg.hdr.enable_permit_joy_dual= p_dual_joy;
+    */
 
-public:
-	static KeyboardSwitch* get_singleton();
+    print_line(arg.hdr.player_count_min);
+    print_line(arg.hdr.player_count_max);
+    print_line(arg.hdr.enable_single_mode);
+    print_line(arg.hdr.enable_permit_joy_dual);
 
-	void initialize();
-	void finalize();
+    Result res = hidLaShowControllerSupport(NULL, &arg);
+    if(res == LibnxError_LibAppletBadExit){
+        print_line("hid connection interface terminated BAD");
 
-	const KeyboardSwitchState& state() const { return _state;}
-	KeyboardSwitchState& state() { return _state;}
+    }else{
+        print_line("hid connection interface terminated GOOD");
+    }
+}
 
-	void show(const String &current);
-	void hide();
-
-	void key_event(Key key, bool pressed = true);
-
-	void process();
-};
-
-void keyboard_string_changed_callback(const char *str, SwkbdChangedStringArg *arg);
-void keyboard_moved_cursor_callback(const char *str, SwkbdMovedCursorArg *arg);
-void keyboard_decided_enter_callback(const char *str, SwkbdDecidedEnterArg *arg);
-void keyboard_decided_cancel_callback();
-
-#endif // KEYBOARD_SWITCH_H
+#endif

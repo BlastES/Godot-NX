@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  keyboard_switch.h                                                     */
+/*  api.cpp                                                               */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,51 +28,51 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef KEYBOARD_SWITCH_H
-#define KEYBOARD_SWITCH_H
+#include "api.h"
 
+#ifdef SWITCH_ENABLED
+#include "os_switch.h"
 #include "switch_wrapper.h"
+#endif
+#include "switch_singleton.h"
 
-#include <core/input/input.h>
+#include "core/config/engine.h"
 
-struct KeyboardSwitchState {
-	bool _opened;
-	int _events = 0;
-	u32 _stringLen = 0;
-	s32 _cursorPos = 0;
-};
+static Switch *switch_singleton;
 
-class KeyboardSwitch {
-private:
-	SwkbdInline _keyboard;
-	KeyboardSwitchState _state;
+void register_switch_api(){
+    GDREGISTER_ABSTRACT_CLASS(Switch);
+    switch_singleton = memnew(Switch);
+    Engine::get_singleton()->add_singleton(Engine::Singleton("Switch", switch_singleton));
+}
 
-	static KeyboardSwitch* _instance;
+void unregister_switch_api(){
+    memdelete(switch_singleton);
+}
 
-protected:
-	KeyboardSwitch();
-	virtual ~KeyboardSwitch();
+Switch *Switch::singleton = nullptr;
 
-public:
-	static KeyboardSwitch* get_singleton();
+Switch *Switch::get_singleton(){
+    return singleton;
+}
 
-	void initialize();
-	void finalize();
+Switch::Switch(){
+    ERR_FAIL_COND_MSG(singleton != nullptr, "Switch singleton already exist.");
+    singleton = this;
+    print_line("Switch singleton initialize");
+}
 
-	const KeyboardSwitchState& state() const { return _state;}
-	KeyboardSwitchState& state() { return _state;}
+Switch::~Switch() {}
 
-	void show(const String &current);
-	void hide();
+void Switch::_bind_methods(){
+    ClassDB::bind_method(D_METHOD("open_gamepad_applet", "min_players", "max_players", "single_mode", "dual_joy"), &Switch::open_gamepad_applet, DEFVAL(1), DEFVAL(4), DEFVAL(true), DEFVAL(true));
+}
 
-	void key_event(Key key, bool pressed = true);
+#ifndef SWITCH_ENABLED
 
-	void process();
-};
+void Switch::open_gamepad_applet(int p_players, bool p_single_mode, bool p_dual_joy){
+    //ERR_FAIL_COND_MSG(p_min_players > p_max_players || p_min_players < 0, "min_players must be >=0 and <=max_players");
+    //ERR_FAIL_COND_MSG(p_max_players > 8, "max_players must be >=min_players and <=8");
+}
 
-void keyboard_string_changed_callback(const char *str, SwkbdChangedStringArg *arg);
-void keyboard_moved_cursor_callback(const char *str, SwkbdMovedCursorArg *arg);
-void keyboard_decided_enter_callback(const char *str, SwkbdDecidedEnterArg *arg);
-void keyboard_decided_cancel_callback();
-
-#endif // KEYBOARD_SWITCH_H
+#endif

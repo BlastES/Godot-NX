@@ -57,6 +57,7 @@ void OS_Switch::initialize_core() {
 }
 
 void OS_Switch::finalize_core() {
+	_keyboard->finalize();
 	OS_Unix::finalize_core();
 }
 
@@ -130,7 +131,7 @@ OS_Switch::OS_Switch(const std::vector<std::string> &args) :
 
 	_joypads = new JoypadSwitch();
 	_touch_screen = new TouchScreenSwitch();
-	_keyboard = KeyboardSwitch::get();
+	_keyboard = KeyboardSwitch::get_singleton();
 	AudioDriverManager::add_driver(&audio_driver);
 
 
@@ -142,5 +143,4 @@ OS_Switch::~OS_Switch() {
 
 	delete _joypads;
 	delete _touch_screen;
-
 }

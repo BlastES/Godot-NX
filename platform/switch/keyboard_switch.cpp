@@ -40,7 +40,7 @@ KeyboardSwitch::KeyboardSwitch() {
 KeyboardSwitch::~KeyboardSwitch() {
 }
 
-KeyboardSwitch *KeyboardSwitch::get() {
+KeyboardSwitch *KeyboardSwitch::get_singleton() {
 	if (_instance == nullptr) {
 		_instance = new KeyboardSwitch();
 	}
@@ -55,6 +55,12 @@ void KeyboardSwitch::initialize() {
 	swkbdInlineSetMovedCursorCallback(&_keyboard, keyboard_moved_cursor_callback);
 	swkbdInlineSetDecidedEnterCallback(&_keyboard, keyboard_decided_enter_callback);
 	swkbdInlineSetDecidedCancelCallback(&_keyboard, keyboard_decided_cancel_callback);
+}
+
+void KeyboardSwitch::finalize() {
+	swkbdInlineClose(&_keyboard);
+	delete _instance;
+	_instance = nullptr;
 }
 
 void KeyboardSwitch::show(const String &current) {
@@ -91,36 +97,36 @@ void keyboard_string_changed_callback(const char *str, SwkbdChangedStringArg *ar
 	std::cout << "keyboard_string_changed_callback: " << arg->stringLen << " " << str << std::endl;
 
 	// We get a string changed event on appear, and another one on setting text.
-	if (KeyboardSwitch::get()->state()._events) {
-		KeyboardSwitch::get()->state()._events--;
+	if (KeyboardSwitch::get_singleton()->state()._events) {
+		KeyboardSwitch::get_singleton()->state()._events--;
 	} else {
-		if (arg->stringLen < KeyboardSwitch::get()->state()._stringLen) {
-			KeyboardSwitch::get()->key_event(Key::BACKSPACE);
+		if (arg->stringLen < KeyboardSwitch::get_singleton()->state()._stringLen) {
+			KeyboardSwitch::get_singleton()->key_event(Key::BACKSPACE);
 		} else if (arg->stringLen > 0) {
-			KeyboardSwitch::get()->key_event((Key)str[arg->stringLen - 1]);
+			KeyboardSwitch::get_singleton()->key_event((Key)str[arg->stringLen - 1]);
 		}
 	}
-	KeyboardSwitch::get()->state()._stringLen = arg->stringLen;
+	KeyboardSwitch::get_singleton()->state()._stringLen = arg->stringLen;
 }
 
 void keyboard_moved_cursor_callback(const char *str, SwkbdMovedCursorArg *arg) {
 	std::cout << "keyboard_moved_cursor_callback: " << arg->cursorPos << " " << str << std::endl;
 
-	if (arg->cursorPos < KeyboardSwitch::get()->state()._cursorPos) {
-		KeyboardSwitch::get()->key_event(Key::LEFT);
+	if (arg->cursorPos < KeyboardSwitch::get_singleton()->state()._cursorPos) {
+		KeyboardSwitch::get_singleton()->key_event(Key::LEFT);
 	} else {
-		KeyboardSwitch::get()->key_event(Key::RIGHT);
+		KeyboardSwitch::get_singleton()->key_event(Key::RIGHT);
 	}
-	KeyboardSwitch::get()->state()._cursorPos = arg->cursorPos;
+	KeyboardSwitch::get_singleton()->state()._cursorPos = arg->cursorPos;
 }
 
 void keyboard_decided_enter_callback(const char *str, SwkbdDecidedEnterArg *arg) {
 	std::cout << "keyboard_decided_enter_callback: " << str << std::endl;
 
-	KeyboardSwitch::get()->key_event(Key::ENTER, true);
-	KeyboardSwitch::get()->state()._opened = false;
+	KeyboardSwitch::get_singleton()->key_event(Key::ENTER, true);
+	KeyboardSwitch::get_singleton()->state()._opened = false;
 }
 
 void keyboard_decided_cancel_callback() {
-	KeyboardSwitch::get()->state()._opened = false;
+	KeyboardSwitch::get_singleton()->state()._opened = false;
 }
