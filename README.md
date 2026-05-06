@@ -9,7 +9,7 @@ Then you should compile the editor with `scons`. For more information, please co
 
 To compile the export templates run `scons platform=switch target=template_(release or debug)` and then run the `switch_export_template.sh` script (you should modify it to put the export template in the corresponding folder or if you want to use the debug export template instead of the release one)
 ## Documentation
-- Libnx: [Official](https://switchbrew.github.io/libnx/index.html), [Deepwiki](deepwiki.com/switchbrew/libnx/1-libnx-overview) &#8592; great for understanding stuff that isn't really explained in the official documentation
+- Libnx: [Official](https://switchbrew.github.io/libnx/index.html), [Deepwiki](https://deepwiki.com/switchbrew/libnx/1-libnx-overview) &#8592; great for understanding stuff that isn't really explained in the official documentation
 - Homebrew Development: [Homebrew Guide](https://egetrickrolled.github.io/Homebrew-Guide-site-b/homebrew_dev/app_dev.html), [switchbrew/switch-examples](https://github.com/switchbrew/switch-examples)
 ## Credits
 - devkitPro/switchbrew for libnx
