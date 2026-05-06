@@ -51,6 +51,7 @@ struct PadStateSwitch : public PadState {
 class JoypadSwitch {
 private:
 	std::array<PadStateSwitch, 8> _pads; //switch support up to 8 controllers
+	Input *input = nullptr;
 
 protected:
 public:
@@ -65,13 +66,12 @@ public:
 	//when only left joy-con is use as a controller horizontally
 	static const PadMappingSwitch switch_joy_left_button_map;
 
-	void initialize();
 	void open_pad(PadStateSwitch &pad);
 	void close_pad(PadStateSwitch &pad);
 
 	void process();
 
-	JoypadSwitch();
+	JoypadSwitch(Input *in);
 	virtual ~JoypadSwitch() = default;
 };
 

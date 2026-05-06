@@ -65,7 +65,7 @@ Switch::Switch(){
 Switch::~Switch() {}
 
 void Switch::_bind_methods(){
-    ClassDB::bind_method(D_METHOD("open_gamepad_applet", "min_players", "max_players", "single_mode", "dual_joy"), &Switch::open_gamepad_applet, DEFVAL(1), DEFVAL(4), DEFVAL(true), DEFVAL(true));
+    ClassDB::bind_method(D_METHOD("open_gamepad_applet", "n_players", "single_mode", "dual_joy"), &Switch::open_gamepad_applet, DEFVAL(4), DEFVAL(false), DEFVAL(true));
 }
 
 #ifndef SWITCH_ENABLED

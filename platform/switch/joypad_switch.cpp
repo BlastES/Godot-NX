@@ -101,24 +101,6 @@ const PadMappingSwitch JoypadSwitch::switch_joy_left_button_map = {
 	}
 };
 
-void JoypadSwitch::initialize() {
-	print_line("JoypadSwitch::initialize");
-
-	//accept up to 8 controllers, all modes
-	padConfigureInput(_pads.size(), HidNpadStyleSet_NpadStandard);
-	// first controler initialized as is #1 AND handheld
-	padInitialize(&_pads[0], HidNpadIdType_No1, HidNpadIdType_Handheld);
-	print_line(padIsConnected(&_pads[0]));
-	if (padIsConnected(&_pads[0]) && !_pads[0].initialized){
-			open_pad(_pads[0]);
-		}
-	// from 2 -> 8 controller controler initialized as is #N
-	for (uint8_t i = 1; i < _pads.size(); i++) {
-		_pads[i].id = i;
-		padInitialize(&_pads[i], HidNpadIdType(i));
-	}
-}
-
 void JoypadSwitch::open_pad(PadStateSwitch &pad) {
 	print_line("JoypadSwitch::open_pad(" + String::num(pad.id) + ")");
 
@@ -169,12 +151,10 @@ void JoypadSwitch::open_pad(PadStateSwitch &pad) {
 
 void JoypadSwitch::close_pad(PadStateSwitch &pad) {
 	pad.initialized = false;
-	Input::get_singleton()->joy_connection_changed(pad.id, false, pad.name);
+	input->joy_connection_changed(pad.id, false, pad.name);
 }
 
 void JoypadSwitch::process() {
-	Input* input = Input::get_singleton();
-
 	for (uint8_t i = 0; i < _pads.size(); i++) {
 		PadStateSwitch &pad = _pads[i];
 		padUpdate(&pad);
@@ -228,5 +208,27 @@ void JoypadSwitch::process() {
 	}
 }
 
-JoypadSwitch::JoypadSwitch() {
+JoypadSwitch::JoypadSwitch(Input *in) {
+	input = in;
+
+	print_line("JoypadSwitch::initialize");
+
+	//accept up to 8 controllers, all modes
+	padConfigureInput(_pads.size(), HidNpadStyleSet_NpadStandard);
+	// first controler initialized as is #1 AND handheld
+	padInitialize(&_pads[0], HidNpadIdType_No1, HidNpadIdType_Handheld);
+	print_line(hidGetNpadStyleSet(HidNpadIdType(0)));
+	if(hidGetNpadStyleSet(HidNpadIdType(0)) != 0){
+		open_pad(_pads[0]);
+	}
+
+	// from 2 -> 8 controller controler initialized as is #N
+	for (uint8_t i = 1; i < _pads.size(); i++) {
+		_pads[i].id = i;
+		padInitialize(&_pads[i], HidNpadIdType(i));
+		print_line(hidGetNpadStyleSet(HidNpadIdType(i)));
+		if(hidGetNpadStyleSet(HidNpadIdType(i)) != 0){
+			open_pad(_pads[i]);
+		}
+	}
 }

@@ -40,7 +40,6 @@
 void OS_Switch::initialize() {
 	print("OS_Switch::initialize\n");
 	initialize_core();
-	//initialize_joypads();
 	_random_generator.init();
 }
 
@@ -67,7 +66,7 @@ Error OS_Switch::get_entropy(uint8_t *r_buffer, int p_bytes) {
 }
 
 void OS_Switch::initialize_joypads() {
-	_joypads->initialize();
+	_joypads = memnew(JoypadSwitch(Input::get_singleton()));
 }
 
 void OS_Switch::delete_main_loop() {
@@ -129,11 +128,9 @@ OS_Switch::OS_Switch(const std::vector<std::string> &args) :
 	//this will provide the create_function to the Main to instanciate the DisplayServer
 	DisplayServerSwitch::register_NVN_driver();
 
-	_joypads = new JoypadSwitch();
-	_touch_screen = new TouchScreenSwitch();
+	_touch_screen = memnew(TouchScreenSwitch());
 	_keyboard = KeyboardSwitch::get_singleton();
 	AudioDriverManager::add_driver(&audio_driver);
-
 
 	print("OS_Switch\n");
 }
