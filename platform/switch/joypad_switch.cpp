@@ -215,20 +215,23 @@ JoypadSwitch::JoypadSwitch(Input *in) {
 
 	//accept up to 8 controllers, all modes
 	padConfigureInput(_pads.size(), HidNpadStyleSet_NpadStandard);
+	
 	// first controler initialized as is #1 AND handheld
 	padInitialize(&_pads[0], HidNpadIdType_No1, HidNpadIdType_Handheld);
-	print_line(hidGetNpadStyleSet(HidNpadIdType(0)));
-	if(hidGetNpadStyleSet(HidNpadIdType(0)) != 0){
-		open_pad(_pads[0]);
-	}
+	padUpdate(&_pads[0]);
 
 	// from 2 -> 8 controller controler initialized as is #N
 	for (uint8_t i = 1; i < _pads.size(); i++) {
 		_pads[i].id = i;
 		padInitialize(&_pads[i], HidNpadIdType(i));
-		print_line(hidGetNpadStyleSet(HidNpadIdType(i)));
-		if(hidGetNpadStyleSet(HidNpadIdType(i)) != 0){
+		padUpdate(&_pads[i]);
+	}
+
+	for(uint8_t i = 0; i < _pads.size(); i++){
+		print_line(padGetStyleSet(&_pads[i]));
+		if(padGetStyleSet(&_pads[i]) != 0){
 			open_pad(_pads[i]);
 		}
 	}
+	
 }
