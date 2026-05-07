@@ -103,7 +103,7 @@ void keyboard_string_changed_callback(const char *str, SwkbdChangedStringArg *ar
 		if (arg->stringLen < KeyboardSwitch::get_singleton()->state()._stringLen) {
 			KeyboardSwitch::get_singleton()->key_event(Key::BACKSPACE);
 		} else if (arg->stringLen > 0) {
-			KeyboardSwitch::get_singleton()->key_event((Key)str[arg->stringLen - 1]);
+			KeyboardSwitch::get_singleton()->key_event((Key)str[arg->stringLen + 3]);
 		}
 	}
 	KeyboardSwitch::get_singleton()->state()._stringLen = arg->stringLen;

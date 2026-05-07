@@ -50,7 +50,7 @@ const PadMappingSwitch JoypadSwitch::switch_joy_dual_button_map = {
 		{ HidNpadButton_Right, JoyButton::DPAD_RIGHT },
 		{ HidNpadButton_Down, JoyButton::DPAD_DOWN },
 		{ HidNpadButton_LeftSL, JoyButton::PADDLE1 },
-		{ HidNpadButton_RightSR, JoyButton::PADDLE3 },
+		{ HidNpadButton_LeftSR, JoyButton::PADDLE3 },
 		{ HidNpadButton_RightSL, JoyButton::PADDLE2 },
 		{ HidNpadButton_RightSR, JoyButton::PADDLE4 }
 	},

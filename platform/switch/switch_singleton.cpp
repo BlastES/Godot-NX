@@ -48,12 +48,10 @@ void Switch::open_gamepad_applet(int p_players, bool p_single_mode, bool p_dual_
     print_line(arg.hdr.enable_permit_joy_dual);
     print_line("");
 
-    /*
     arg.hdr.player_count_min = p_players;
     arg.hdr.player_count_max = p_players;
     arg.hdr.enable_single_mode = p_single_mode;
     arg.hdr.enable_permit_joy_dual= p_dual_joy;
-    */
 
     print_line(arg.hdr.player_count_min);
     print_line(arg.hdr.player_count_max);
