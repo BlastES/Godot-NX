@@ -36,8 +36,8 @@
 
 #include "audio_driver_switch.h"
 #include "joypad_switch.h"
-#include "keyboard_switch.h"
 #include "touch_screen_switch.h"
+#include "api/switch_singleton.h"
 
 #include "switch_wrapper.h"
 
@@ -49,7 +49,7 @@ class OS_Switch : public OS_Unix {
 	CryptoCore::RandomGenerator _random_generator;
 	std::vector<std::string> _args;
 	JoypadSwitch* _joypads = nullptr;
-	KeyboardSwitch* _keyboard = nullptr;
+	Switch* _api = nullptr;
 	TouchScreenSwitch* _touch_screen = nullptr;
 	AudioDriverSwitch audio_driver;
 

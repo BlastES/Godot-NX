@@ -213,6 +213,9 @@ JoypadSwitch::JoypadSwitch(Input *in) {
 
 	print_line("JoypadSwitch::initialize");
 
+	input->set_use_accumulated_input(false);
+	input->set_use_input_buffering(false);
+
 	//accept up to 8 controllers, all modes
 	padConfigureInput(_pads.size(), HidNpadStyleSet_NpadStandard);
 	

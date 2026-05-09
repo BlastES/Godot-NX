@@ -40,7 +40,6 @@
 #include "drivers/gles3/rasterizer_gles3.h"
 
 #include "switch_wrapper.h"
-#include "keyboard_switch.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -333,11 +332,9 @@ Key DisplayServerSwitch::keyboard_get_keycode_from_physical(Key p_keycode) const
 }
 
 void DisplayServerSwitch::virtual_keyboard_show(const String &p_existing_text, const Rect2 &p_screen_rect, VirtualKeyboardType p_type, int p_max_length, int p_cursor_start, int p_cursor_end){
-	KeyboardSwitch::get_singleton()->show(p_existing_text);
 }
 
 void DisplayServerSwitch::virtual_keyboard_hide(){
-	KeyboardSwitch::get_singleton()->hide();
 }
 
 void DisplayServerSwitch::process_events() {

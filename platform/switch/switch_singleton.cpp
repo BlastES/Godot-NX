@@ -29,8 +29,9 @@
 /**************************************************************************/
 
 #include "api/switch_singleton.h"
+#include "core/input/input.h"
 
-#include "switch_wrapper.h"
+#include <iostream>
 
 #ifdef SWITCH_ENABLED
 
@@ -42,29 +43,108 @@ void Switch::open_gamepad_applet(int p_players, bool p_single_mode, bool p_dual_
 
     hidLaCreateControllerSupportArg(&arg);
 
-    print_line(arg.hdr.player_count_min);
-    print_line(arg.hdr.player_count_max);
-    print_line(arg.hdr.enable_single_mode);
-    print_line(arg.hdr.enable_permit_joy_dual);
-    print_line("");
-
-    arg.hdr.player_count_min = p_players;
+    arg.hdr.player_count_min = p_players-1;
     arg.hdr.player_count_max = p_players;
     arg.hdr.enable_single_mode = p_single_mode;
     arg.hdr.enable_permit_joy_dual= p_dual_joy;
 
-    print_line(arg.hdr.player_count_min);
-    print_line(arg.hdr.player_count_max);
-    print_line(arg.hdr.enable_single_mode);
-    print_line(arg.hdr.enable_permit_joy_dual);
-
-    Result res = hidLaShowControllerSupport(NULL, &arg);
+	// Should use the regular version, but the forSystem always shows the UI and the regular version is bugged.
+    Result res = hidLaShowControllerSupportForSystem(NULL, &arg, NULL);
     if(res == LibnxError_LibAppletBadExit){
         print_line("hid connection interface terminated BAD");
 
     }else{
         print_line("hid connection interface terminated GOOD");
     }
+}
+
+void Switch::initialize_keyboard() {
+	swkbdInlineCreate(&_keyboard);
+
+	swkbdInlineLaunchForLibraryApplet(&_keyboard, SwkbdInlineMode_AppletDisplay, 0);
+	swkbdInlineSetChangedStringCallback(&_keyboard, keyboard_string_changed_callback);
+	swkbdInlineSetMovedCursorCallback(&_keyboard, keyboard_moved_cursor_callback);
+	swkbdInlineSetDecidedEnterCallback(&_keyboard, keyboard_decided_enter_callback);
+	swkbdInlineSetDecidedCancelCallback(&_keyboard, keyboard_decided_cancel_callback);
+}
+
+void Switch::finalize_keyboard() {
+	swkbdInlineClose(&_keyboard);
+}
+
+void Switch::update_text(const char *str) {
+	_text = str;
+}
+
+void Switch::show_keyboard(const String &current, SoftwareKeyboardType p_type) {
+	if (!_state._opened) {
+		_state._opened = true;
+		_text = current;
+		SwkbdAppearArg arg;
+		swkbdInlineMakeAppearArg(&arg, SwkbdType_Normal);
+		swkbdInlineSetInputText(&_keyboard, current.utf8().get_data());
+		swkbdInlineSetCursorPos(&_keyboard, current.size() - 1);
+		swkbdInlineAppear(&_keyboard, &arg);
+	}
+}
+
+void Switch::hide_keyboard() {
+	_state._opened = false;
+	swkbdInlineDisappear(&_keyboard);
+}
+
+void Switch::key_event(Key key, bool pressed) {
+	Ref<InputEventKey> ev;
+	ev.instantiate();
+	ev->set_echo(false);
+	ev->set_pressed(pressed);
+	ev->set_keycode(key);
+	Input::get_singleton()->parse_input_event(ev);
+};
+
+void Switch::process_keyboard()
+{
+	swkbdInlineUpdate(&_keyboard, NULL);
+}
+
+void keyboard_string_changed_callback(const char *str, SwkbdChangedStringArg *arg) {
+	std::cout << "keyboard_string_changed_callback: " << arg->stringLen << " " << str << std::endl;
+	// We get a string changed event on appear, and another one on setting text.
+	if (Switch::get_singleton()->keyboard_state()._events) {
+		Switch::get_singleton()->keyboard_state()._events--;
+		return;
+	}
+	
+	if (arg->stringLen < Switch::get_singleton()->keyboard_state()._stringLen) {
+		Switch::get_singleton()->key_event(Key::BACKSPACE);
+	} else if (arg->stringLen > 0) {
+		Switch::get_singleton()->key_event((Key)(str[arg->stringLen - 1] - 32));
+	}
+
+	Switch::get_singleton()->keyboard_state()._stringLen = arg->stringLen;
+	Switch::get_singleton()->update_text(str);
+}
+
+void keyboard_moved_cursor_callback(const char *str, SwkbdMovedCursorArg *arg) {
+	std::cout << "keyboard_moved_cursor_callback: " << arg->cursorPos << " " << str << std::endl;
+	if (arg->cursorPos < Switch::get_singleton()->keyboard_state()._cursorPos) {
+		Switch::get_singleton()->key_event(Key::LEFT);
+	} else {
+		Switch::get_singleton()->key_event(Key::RIGHT);
+	}
+	Switch::get_singleton()->keyboard_state()._cursorPos = arg->cursorPos;
+}
+
+void keyboard_decided_enter_callback(const char *str, SwkbdDecidedEnterArg *arg) {
+	std::cout << "keyboard_decided_enter_callback: " << str << std::endl;
+
+	Switch::get_singleton()->key_event(Key::ENTER, true);
+	Switch::get_singleton()->keyboard_state()._opened = false;
+	Switch::get_singleton()->call_deferred("emit_signal", SNAME("keyboard_string_result"), str);
+}
+
+void keyboard_decided_cancel_callback() {
+	Switch::get_singleton()->keyboard_state()._opened = false;
 }
 
 #endif

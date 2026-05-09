@@ -34,6 +34,7 @@
 #include "main/main.h"
 
 #include "display_server_switch.h"
+#include "api/switch_singleton.h"
 
 #include "os_switch.h"
 
@@ -52,11 +53,9 @@ void OS_Switch::finalize() {
 void OS_Switch::initialize_core() {
 	OS_Unix::initialize_core();
 	_touch_screen->initialize();
-	_keyboard->initialize();
 }
 
 void OS_Switch::finalize_core() {
-	_keyboard->finalize();
 	OS_Unix::finalize_core();
 }
 
@@ -113,7 +112,7 @@ void OS_Switch::run() {
 
 		_joypads->process();
 		_touch_screen->process();
-		_keyboard->process();
+		Switch::get_singleton()->process_keyboard();
 
 		if (Main::iteration()) {
 			break;
@@ -129,7 +128,6 @@ OS_Switch::OS_Switch(const std::vector<std::string> &args) :
 	DisplayServerSwitch::register_NVN_driver();
 
 	_touch_screen = memnew(TouchScreenSwitch());
-	_keyboard = KeyboardSwitch::get_singleton();
 	AudioDriverManager::add_driver(&audio_driver);
 
 	print("OS_Switch\n");

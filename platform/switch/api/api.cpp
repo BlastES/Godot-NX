@@ -59,20 +59,42 @@ Switch *Switch::get_singleton(){
 Switch::Switch(){
     ERR_FAIL_COND_MSG(singleton != nullptr, "Switch singleton already exist.");
     singleton = this;
+    singleton->initialize_keyboard();
     print_line("Switch singleton initialize");
 }
 
-Switch::~Switch() {}
+Switch::~Switch() {
+    singleton->finalize_keyboard();
+    singleton = nullptr;
+}
 
 void Switch::_bind_methods(){
     ClassDB::bind_method(D_METHOD("open_gamepad_applet", "n_players", "single_mode", "dual_joy"), &Switch::open_gamepad_applet, DEFVAL(4), DEFVAL(false), DEFVAL(true));
+    ClassDB::bind_method(D_METHOD("show_keyboard"), &Switch::show_keyboard);
+
+    BIND_ENUM_CONSTANT(NORMAL_KEYBOARD);
+	BIND_ENUM_CONSTANT(NUMPAD_KEYBOARD);
+	BIND_ENUM_CONSTANT(QWERTY_KEYBOARD);
+	BIND_ENUM_CONSTANT(LATIN_KEYBOARD);
+	BIND_ENUM_CONSTANT(SIMPLIFIED_CHINESE_KEYBOARD);
+	BIND_ENUM_CONSTANT(TRADITIONAL_CHINESE_KEYBOARD);
+	BIND_ENUM_CONSTANT(KOREAN_KEYBOARD);
+	BIND_ENUM_CONSTANT(ALL_LANGUAGES_KEYBOARD);
+
+    ADD_SIGNAL(MethodInfo("keyboard_string_result", PropertyInfo(Variant::STRING, "result")));
 }
 
 #ifndef SWITCH_ENABLED
-
 void Switch::open_gamepad_applet(int p_players, bool p_single_mode, bool p_dual_joy){
     //ERR_FAIL_COND_MSG(p_min_players > p_max_players || p_min_players < 0, "min_players must be >=0 and <=max_players");
     //ERR_FAIL_COND_MSG(p_max_players > 8, "max_players must be >=min_players and <=8");
 }
 
+void Switch::update_text(const char *str) {}
+
+void Switch::show_keyboard(const String &current, SoftwareKeyboardType p_type) {}
+
+void Switch::initialize_keyboard() {}
+
+void Switch::finalize_keyboard() {}
 #endif
