@@ -419,7 +419,7 @@ DisplayServerSwitch::DisplayServerSwitch(const String &p_rendering_driver, Windo
 		return;
 	}
 
-	RasterizerGLES3::make_current();
+	RasterizerGLES3::make_current(true);
 
 	// plug nvwindows id
 	// WindowID main_window = _create_window(p_mode, p_vsync_mode, p_flags, Rect2i(window_position, p_resolution));
