@@ -375,7 +375,7 @@ void finalize_theme_db() {
 	theme_db = nullptr;
 }
 
-//#define DEBUG_INIT
+#define DEBUG_INIT
 #ifdef DEBUG_INIT
 #define MAIN_PRINT(m_txt) print_line(m_txt)
 #else
@@ -2497,6 +2497,7 @@ Error Main::setup2() {
 
 	rendering_server = memnew(RenderingServerDefault(OS::get_singleton()->get_render_thread_mode() == OS::RENDER_SEPARATE_THREAD));
 
+	print_verbose("rendering_server init()");
 	rendering_server->init();
 	//rendering_server->call_set_use_vsync(OS::get_singleton()->_use_vsync);
 	rendering_server->set_render_loop_enabled(!disable_render_loop);
@@ -2520,10 +2521,12 @@ Error Main::setup2() {
 	}
 #endif
 
+	print_verbose("initialize_joypads()");
 	OS::get_singleton()->initialize_joypads();
 
 	/* Initialize Audio Driver */
 
+	print_verbose("AudioDriverManager()");
 	AudioDriverManager::initialize(audio_driver_idx);
 
 	print_line(" "); //add a blank line for readability
