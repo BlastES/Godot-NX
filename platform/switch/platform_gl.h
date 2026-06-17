@@ -31,6 +31,10 @@
 #ifndef PLATFORM_GL_H
 #define PLATFORM_GL_H
 
+#ifndef GLES_API_ENABLED
+#define GLES_API_ENABLED
+#endif
+
 #include "platform/switch/gl_manager_switch.h"
 
 #endif // PLATFORM_GL_H
